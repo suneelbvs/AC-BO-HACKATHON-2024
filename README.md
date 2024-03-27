@@ -61,5 +61,9 @@ Task items:
 ### Installation
 To install an editable version of the package, run the following command:
 ```bash
-pip install -r requirements.txt
+pip install PyTDC==0.3.6
+pip install xgboost
+pip install torch
+pip install gpytorch
+pip install requests
 ```
