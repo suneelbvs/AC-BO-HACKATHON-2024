@@ -15,10 +15,13 @@ def optimize(*,
     :param max_num_results: The maximum number of results to return.
     :param mode: The optimization mode, either "max" or "min".
     :param kwargs: Additional keyword arguments for the acquisition function.
-    :return: The optimized acquisition function.
+    :return: The indices of the top candidates (that are not in the active dataset).
     """
 
     acquisition_function_values = acquisition_function(mean, uncertainty, **kwargs)
+
+    # convert the array of values into an array of (value, index)
+    # so when we remove the values that are in the active dataset, we can still keep track of the indices in the original array
     indices = np.arange(acquisition_function_values.shape[0])
     values_with_indices = np.column_stack((acquisition_function_values, indices))
 

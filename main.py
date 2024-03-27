@@ -76,11 +76,11 @@ if __name__ == "__main__":
     print(f"loaded {loader.name} dataset. num entries: {initial_dataset_size}")
 
     # 2: initialize the model + initialise the first 100 data points from the dataset
-    active_dataset = np.arange(0, 2) # TODO: randomize the indices?
+    active_dataset = np.arange(0, initial_dataset_size//20) # TODO: randomize the indices?
 
     acquisition_functions = [
-        (greedy_acquisition, "Greedy"),
         (expected_improvement_acquisition, "Expected Improvement"),
+        (greedy_acquisition, "Greedy"),
         (probability_of_improvement_acquisition, "Probability of Improvement"),
         (random_acquisition, "Random"),
         (upper_confidence_bound_acquisition, "Upper Confidence Bound"),
