@@ -1,7 +1,7 @@
 import numpy as np
 import torch
 import gpytorch
-from model import Model
+from .model import Model
 
 class GaussianProcessModel(gpytorch.models.ExactGP, Model):
     """
