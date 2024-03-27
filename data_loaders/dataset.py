@@ -3,6 +3,7 @@ import pandas as pd
 
 class DataLoader:
     def __init__(self):
+        self.name = ""
         # You should perform feature extraction and data cleaning here
         pass
 

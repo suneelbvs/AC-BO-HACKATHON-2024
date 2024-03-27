@@ -6,7 +6,7 @@ SEED = 9582
 class XGBoostModel(Model):
     def __init__(self):
         self.models = []
-        self.num_models = 5 # The reason why we want multiple models is so we can determine the variance for each prediction
+        self.num_models = 3 # The reason why we want multiple models is so we can determine the variance for each prediction
         self.params = {
             'reg_alpha': 0.0008774661176012108,
             'reg_lambda': 2.542812743920178,
@@ -34,6 +34,6 @@ class XGBoostModel(Model):
         predictions = np.empty((self.num_models, test_x.shape[0]))
         for i in range(self.num_models):
             predictions[i] = self.models[i].predict(test_x)
-        mean = np.mean(predictions, axis=-1)
-        variance = np.var(predictions, axis=-1)
+        mean = np.mean(predictions, axis=0)
+        variance = np.var(predictions, axis=0)
         return mean, variance
