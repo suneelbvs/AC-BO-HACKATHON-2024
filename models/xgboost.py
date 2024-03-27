@@ -3,10 +3,10 @@ import numpy as np
 from .model import Model
 
 SEED = 9582
-class XGBoost(Model):
+class XGBoostModel(Model):
     def __init__(self):
         self.models = []
-        self.num_models = 5 # The reason why we want multiple models is so we can determine the variance for each prediction
+        self.num_models = 3 # The reason why we want multiple models is so we can determine the variance for each prediction
         self.params = {
             'reg_alpha': 0.0008774661176012108,
             'reg_lambda': 2.542812743920178,
@@ -30,10 +30,10 @@ class XGBoost(Model):
             model.fit(data_x, data_y)
             self.models.append(model)
 
-    def predict(self, test_X):
-        predictions = np.empty((self.num_models, test_X.shape[0]))
+    def predict(self, test_x):
+        predictions = np.empty((self.num_models, test_x.shape[0]))
         for i in range(self.num_models):
-            predictions[i] = self.models[i].predict(test_X)
-        mean = np.mean(predictions, axis=-1)
-        variance = np.var(predictions, axis=-1)
+            predictions[i] = self.models[i].predict(test_x)
+        mean = np.mean(predictions, axis=0)
+        variance = np.var(predictions, axis=0)
         return mean, variance

@@ -1,27 +1,29 @@
-from dataset_loaders.tox21 import Tox21
-
-import numpy as np
+from models import XGBoostModel
+from data_loaders.tox21 import Tox21
 
 
 if __name__ == "__main__":
     NUM_ACTIVE_LEARNING_LOOPS = 5
     # 1: load the fingerprint + label data + set the threshold for the succes metric
-    dataset = Tox21
+    data_loader = Tox21()
+    print(f"loaded {data_loader.name} dataset")
+
+    model = XGBoostModel()
+
+    full_dataset = data_loader.full_dataset()
 
     # 2: initialize the model + initialise the first 100 data points from the dataset
-    active_dataset = dataset.get_init_datapoints()
+    initial_dataset_size = full_dataset.shape[0]
+    active_dataset = full_dataset[:initial_dataset_size] # TODO: randomly shuffle the data?
 
     # 3: carry out the active learning loop for N times
-    for i in range(N):
+    for i in range(NUM_ACTIVE_LEARNING_LOOPS):
         # 3.1 train the surrogate model from model.py on the active learning dataset
-        model.fit(active_dataset['X'], active_dataset['Y'])
-        trainer = ModelTrainer(
-            X=active_dataset['X'],
-            Y=active_dataset['Y'],
-            params=xgboost_params,
-        )
-        trainer.train_model()
+        model.fit(data_loader.x(active_dataset), data_loader.y(active_dataset))
+
         # 3.2 run the surrogate model over the entire dataset and get predicted values for endpoints
+        mean, uncertainty = model.predict(data_loader.x(full_dataset))
+        print(mean, uncertainty)
     
         # 3.3. feed the predicted values into the acquisition function
     
