@@ -22,11 +22,14 @@ dependencies = [
     "xgboost",
     "PyTDC",
     "jupyter",
+    "ipython",
     "matplotlib",
     "gpytorch",
     "torch",
     "scikit-learn",
     "scipy",
+    "mordred",
+    "rdkit",
 ]
 
 [tool.pylint.'MESSAGES CONTROL']
