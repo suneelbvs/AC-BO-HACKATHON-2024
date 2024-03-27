@@ -40,6 +40,7 @@ frozenlist==1.4.1
 fsspec==2024.3.1
 fuzzywuzzy==0.18.0
 gget==0.28.4
+gpytorch==1.11
 h11==0.14.0
 h5py==3.10.0
 httpcore==1.0.4
@@ -144,6 +145,7 @@ tiledb==0.25.1
 tiledbsoma==1.7.2
 tinycss2==1.2.1
 tomli==2.0.1
+torch==2.2.2
 tornado==6.4
 tqdm==4.65.0
 traitlets==5.14.2

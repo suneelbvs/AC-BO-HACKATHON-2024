@@ -57,3 +57,9 @@ Task items:
 | Metrics                     | Yunheng Zou          | Scikit-learn       |
 | Applicability Domain (AOD)  | Luis Walter          | Scikit-learn       |
 | Plotting                    | Jan Christopher Spies| Matplotlib         |
+
+### Installation
+To install an editable version of the package, run the following command:
+```bash
+pip install -e .
+```
