@@ -10,9 +10,9 @@ The dataset targets three main areas: `hERG_at_1uM`, `hERG_at_10uM`, and `hERG_i
 
 ### About potency:
 
-- **hERG_inhib (Binary classification):**
+- ** Label : hERG_inhib (Binary classification):**
 - Given a drug's SMILES string, predict whether it blocks (1) or does not block (0) the hERG channel.
-- This classification is based on whether `hERG_at_10uM < -50`, i.e., whether the compound has an IC50 of less than 10µM.
+- This classification is based on whether `hERG inhibition_at_10uM < -50`, i.e., whether the compound has an IC50 of less than 10µM.
 
 ## Cleaned Dataset
 Upon reviewing the dataset for property distribution, it was observed that the compounds are generally larger molecules, even with molecular weights > 1000, ring counts of 10, and TPSA > 400. To ensure the dataset's relevance and manageability, property filters were applied to select compounds with the following characteristics:
