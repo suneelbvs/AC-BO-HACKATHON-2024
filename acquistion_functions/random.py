@@ -1,7 +1,7 @@
 """ This file contains the Greedy acquisition function. """
 import numpy as np
 
-def greedy(mean: np.ndarray, uncertainty: np.ndarray) -> np.ndarray:
+def random(mean: np.ndarray, uncertainty: np.ndarray) -> np.ndarray:
     """
     Compute the Random acquisition function.
     This function actually returns a vector of zeros since all values have the same probability.
