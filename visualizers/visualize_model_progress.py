@@ -20,7 +20,7 @@ def visualize_hits(optimization_results: Dict[str, Result]):
     ax.set_title('Num Hits')
     ax.legend()
 
-    plt.savefig('out/hit_graph.png')
+    plt.savefig('hit_graph.png')
 
     # Display the graph
     # plt.show()

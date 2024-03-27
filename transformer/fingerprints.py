@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 from rdkit import Chem
 from rdkit.Chem import AllChem
 from rdkit import DataStructs
@@ -8,16 +9,8 @@ class FingerprintsTransformer:
     def __init__(self, dataset: pd.DataFrame, col_mol:str, fingerprint_type:str):
         self.dataset = dataset
         self.col_mol = col_mol
-        #self.mols = self.prepare_molecules()
         self.fingerprint_type = fingerprint_type
-
-    def prepare_molecules(self):
-        #TODO: delete not necessary
-        """
-        Converts SMILES strings in the specified column to RDKit molecule objects and replaces the column.
-        """
-        # Convert SMILES to molecule objects and replace the column in the DataFrame
-        self.dataset["SMILES"] = self.dataset[self.col_mol].apply(lambda smi: Chem.MolFromSmiles(smi) if pd.notnull(smi) else None)
+        self.transform()
 
     def transform(self):
         """
@@ -39,13 +32,23 @@ class FingerprintsTransformer:
         :param bits: The size of the bit vector for the ECFP fingerprints.
         :return: pandas Series where each element is an ECFP fingerprint list.
         """
+        def to_fingerprint(mol):
+            """Helper function to convert a molecule to a fingerprint."""
+            if mol:
+                fp = AllChem.GetMorganFingerprintAsBitVect(mol, radius, nBits=bits)
+                return list(map(int, DataStructs.BitVectToText(fp)))
+            return None
+
         # Convert SMILES to molecule objects
         mols = smiles_series.apply(Chem.MolFromSmiles)
         
-        # Generate ECFP fingerprints for each molecule
-        ecfp_vector = mols.apply(lambda mol: AllChem.GetMorganFingerprintAsBitVect(mol, radius, bits) if mol else None)
-        
-        # Convert fingerprints to list of integers
-        ecfp_list = ecfp_vector.apply(lambda fp: list(map(int, DataStructs.BitVectToText(fp))) if fp else None)
+        # Generate ECFP fingerprints for each molecule and convert to list of integers
+        ecfp_list = mols.apply(to_fingerprint)
 
         return ecfp_list
+    
+    def to_np(self):
+        """
+        Converts the fingerprints column to a numpy array.
+        """
+        return np.array(self.dataset['fingerprints'].to_list())
