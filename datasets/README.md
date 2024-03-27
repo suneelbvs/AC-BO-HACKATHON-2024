@@ -31,3 +31,21 @@ These filters were chosen to focus on compounds with properties that are more ty
 
 # AMES Mutagenicity (Source: TDC)
 
+
+# Half life (Source: TDC)
+The half-life of a drug refers to the time it takes for the concentration of the drug in the body to be reduced by half. 
+It is a measure of the drug's duration of action. This dataset is associated with the CHEMBL assay ID 1614674.
+
+## Task Description
+
+- **Type:** Regression (value represents halflife in hours) 
+- **Objective:** Given a drug's SMILES string, predict the duration of its half-life.
+
+## Dataset Statistics
+
+| Dataset Description | Total Compounds |
+|---------------------|-----------------|
+| Original Data       | 667             |
+| Cleaned Dataset     | 489             |
+
+
