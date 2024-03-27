@@ -8,15 +8,17 @@ from typing import Callable, Dict
 
 from visualizers.visualize_model_progress import visualize_hits
 
+NUM_ACTIVE_LEARNING_LOOPS = 5
+THRESHOLD = 0.02
 
 def test_acquisition_function(
+        *,
         loader: DataLoader,
+        initial_dataset: np.ndarray,
         acquisition_function: Callable,
         acquisition_function_name: str,
 ) -> [Result]:
-    # 2: initialize the model + initialise the first 100 data points from the dataset
-    active_dataset = np.arange(0, initial_dataset_size//20) # TODO: randomize the indices?
-
+    active_dataset = initial_dataset
     results: [Result] = []
 
     # 3: carry out the active learning loop for N times
@@ -63,13 +65,14 @@ def test_acquisition_function(
     return results
 
 if __name__ == "__main__":
-    NUM_ACTIVE_LEARNING_LOOPS = 5
-    THRESHOLD = 0.02
-
     # 1: load the fingerprint + label data + set the threshold for the succes metric
     loader = Tox21()
     initial_dataset_size = loader.size()
     print(f"loaded {loader.name} dataset. num entries: {initial_dataset_size}")
+
+    # 2: initialize the model + initialise the first 100 data points from the dataset
+    active_dataset = np.arange(0, initial_dataset_size//20) # TODO: randomize the indices?
+
     acquisition_functions = [
         (probability_of_improvement_acquisition, "Probability of Improvement"),
         (greedy_acquisition, "Greedy"),
@@ -78,7 +81,11 @@ if __name__ == "__main__":
     model = XGBoostModel()
     optimization_results: Dict[str, Result] = {}
     for acquisition_function, name in acquisition_functions:
-        optimization_results[name] = test_acquisition_function(loader, acquisition_function, name)
+        optimization_results[name] = test_acquisition_function(
+            loader=loader,
+            initial_dataset=np.copy(active_dataset),
+            acquisition_function=acquisition_function,
+            acquisition_function_name=name)
     # 4: save everything
     visualize_hits(optimization_results)
 
