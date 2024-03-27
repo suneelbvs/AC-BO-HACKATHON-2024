@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 
+# This class will be used to load the dataset and perform feature extraction
+# When we do bayesian optimization, we'll call the dataloader to get the x and y values for each dataset slice
 class DataLoader:
     def __init__(self):
         self.name = ""
