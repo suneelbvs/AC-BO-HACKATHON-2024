@@ -1,30 +1,37 @@
+from xgboost import XGBRegressor
+import numpy as np
 SEED = 9582
-
-model_params = {
-    'reg_alpha': 0.0008774661176012108,
-    'reg_lambda': 2.542812743920178,
-    'colsample_bynode': 0.7839026197349153,
-    'subsample': 0.8994226268096415, 
-    # subsample=1,
-    'eta': 0.04730766698056879, 
-    'max_depth': 3, 
-    'n_estimators': 500,
-    'random_state': SEED,
-    'eval_metric': 'rmse',
-    'n_jobs': -1,
-    'learning_rate':0.023,
-}
-
-
 class XGBoostModel:
-    def __init__(self, data_X, data_Y, params):
-        self.params = params
-        self.X = data_X
-        self.Y = data_Y
+    def __init__(self):
         self.models = []
-        self.num_models = 5 # The reason why we want 
+        self.num_models = 5 # The reason why we want multiple models is so we can determine the variance for each prediction
+        self.params = {
+            'reg_alpha': 0.0008774661176012108,
+            'reg_lambda': 2.542812743920178,
+            'colsample_bynode': 0.7839026197349153,
+            'subsample': 0.8994226268096415, 
+            # subsample=1,
+            'eta': 0.04730766698056879, 
+            'max_depth': 3, 
+            'n_estimators': 500,
+            'eval_metric': 'rmse',
+            'n_jobs': -1,
+            'learning_rate':0.023,
+        }
 
 
-    def fit():
-        for
+    def fit(self, data_x, data_y):
+        for i in range(self.num_models):
+            # Init a random seed for each model so we can get multiple predictions and calculate the variance of our model
+            self.params["random_state"] = SEED + i
+            model = XGBRegressor(**self.params)
+            model.fit(data_x, data_y)
+            self.models.append(model)
 
+    def predict(self, test_X):
+        predictions = np.empty((self.num_models, test_X.shape[0]))
+        for i in range(self.num_models):
+            predictions[i] = self.models[i].predict(test_X)
+        mean = np.mean(predictions, axis=-1)
+        variance = np.var(predictions, axis=-1)
+        return mean, variance
