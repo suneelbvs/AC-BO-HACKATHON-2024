@@ -1,4 +1,7 @@
 # Datasets:
+We've sourced three datasets from the Therapeutics Data Commons (TDC) and enhanced them through careful review and advanced featurization. 
+These steps enrich the data, making it more valuable for developing precise and reliable predictive models. 
+Below, you'll find details about each dataset and the improvements we've applied:
 
 # hERG Central (Source: TDC)
 
@@ -30,7 +33,24 @@ These filters were chosen to focus on compounds with properties that are more ty
 
 
 # AMES Mutagenicity (Source: TDC)
+Mutagenicity refers to the capability of a substance to induce genetic alterations. 
+Drugs capable of damaging DNA may lead to cell death or other significant adverse effects. 
+The most prevalent method for assessing the mutagenicity of compounds today is the Ames test, a short-term bacterial reverse mutation assay. 
+This test, developed by Professor Ames, is effective in detecting a wide array of compounds that can cause genetic damage and frameshift mutations. 
+The dataset compiles information from four different studies.
 
+## Task Description
+
+The task is a binary classification challenge. 
+Given a drug's SMILES (Simplified Molecular Input Line Entry System) string, the goal is to predict whether it is mutagenic (1) or not mutagenic (0).
+
+## Dataset Statistics
+
+The dataset includes 7,255 drugs.
+| Dataset         | Total Compounds | Number of 0s | Number of 1s |
+|-----------------|-----------------|--------------|--------------|
+| Original Data   | 7278            | 3304         | 3974         |
+| Cleaned Dataset | 3533            | 1463         | 2070         |
 
 # Half life (Source: TDC)
 The half-life of a drug refers to the time it takes for the concentration of the drug in the body to be reduced by half. 
