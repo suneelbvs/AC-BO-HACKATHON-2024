@@ -1,7 +1,9 @@
 from xgboost import XGBRegressor
 import numpy as np
+from .model import Model
+
 SEED = 9582
-class XGBoostModel:
+class XGBoost(Model):
     def __init__(self):
         self.models = []
         self.num_models = 5 # The reason why we want multiple models is so we can determine the variance for each prediction

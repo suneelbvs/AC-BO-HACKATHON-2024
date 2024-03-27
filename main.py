@@ -1,34 +1,12 @@
+from dataset_loaders.tox21 import Tox21
 
-# THIS IS A STUPID SKELETON PROJECT
-
-
-from model import ModelTrainer
-from dataset import Dataset
-from params import xgboost_params
-
-from tdc.utils import retrieve_label_name_list
-from xgboost import XGBRegressor
-from sklearn.model_selection import StratifiedKFold
-from sklearn.metrics import mean_squared_error
 import numpy as np
-from tdc.single_pred import Tox
-
-
-# HACK: to get dataset
-label_list = retrieve_label_name_list('Tox21')
-data = Tox(name = 'Tox21', label_name = label_list[0])
-split = data.get_split()
-test = split['test']
-train = split['train']
 
 
 if __name__ == "__main__":
-    # params
-    N = 5 # number of active learning loops
-
-
+    NUM_ACTIVE_LEARNING_LOOPS = 5
     # 1: load the fingerprint + label data + set the threshold for the succes metric
-    dataset = Dataset()
+    dataset = Tox21
 
     # 2: initialize the model + initialise the first 100 data points from the dataset
     active_dataset = dataset.get_init_datapoints()
@@ -36,6 +14,7 @@ if __name__ == "__main__":
     # 3: carry out the active learning loop for N times
     for i in range(N):
         # 3.1 train the surrogate model from model.py on the active learning dataset
+        model.fit(active_dataset['X'], active_dataset['Y'])
         trainer = ModelTrainer(
             X=active_dataset['X'],
             Y=active_dataset['Y'],
