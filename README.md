@@ -43,7 +43,7 @@ AC-BO-HACKATHON-2024/
     ├── <Applicability domain assessment methods>
 ```
 
-# Names added random; please feel free to edit.
+# update the names for the below tasks
 Task items:
 | Task Item                   | Team Member          | Package/Tool       |
 |-----------------------------|----------------------|--------------------|
