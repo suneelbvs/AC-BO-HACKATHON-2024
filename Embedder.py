@@ -10,6 +10,7 @@ from rdkit.Chem import AllChem
 from rdkit import DataStructs
 import pandas as pd
 from mordred import Calculator, descriptors
+import h5py
 
 
 
@@ -22,6 +23,9 @@ if Dataset == 'Ames':
 
 elif Dataset == 'halflife':
     df_data = pd.read_csv("/home/student/j_spie17/Hackathon/halflife_dataset.csv")
+    
+elif Dataset == 'HERG':
+    df_data = pd.read_csv("HERG_dataset_final.csv")
 #################################################################
 
 
@@ -66,5 +70,8 @@ df_fp = pd.DataFrame({
 #############################################################
 #Export Data
 df_fp.to_csv(f'/home/student/j_spie17/Hackathon/Fingerprints/{Dataset}_{fingerprint}.csv', index=False)
+
+#export the fingerprints in bit in hdf5 format
+df_fp.to_hdf(f'{Dataset}_{fingerprint}.h5', key='df_mordred', mode='w')
 
 print('done')
