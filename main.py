@@ -22,8 +22,11 @@ def test_acquisition_function(
         acquisition_function: Callable,
         acquisition_function_name: str,
 ) -> [Result]:
+    entire_dataset = np.arange(0, loader.size()) # PERF: this slow
     active_dataset = initial_dataset
     results: [Result] = []
+
+    y = loader.y(entire_dataset) == 1
 
     # 3: carry out the active learning loop for N times
     for batch_num in range(1, NUM_ACTIVE_LEARNING_LOOPS + 1):
@@ -35,24 +38,19 @@ def test_acquisition_function(
         model.fit(loader.x(active_dataset), loader.y(active_dataset))
 
         # 3.3 run the surrogate model over the unseen dataset and get predicted values for endpoints
-        unseen_data = np.setdiff1d(np.arange(0, initial_dataset_size), active_dataset)
-        mean, uncertainty = model.predict(loader.x(unseen_data))
+        mean, uncertainty = model.predict(loader.x(entire_dataset))
 
-        # 3.4 compute the success metric (number of 'hits', positive examples that are above the threshold (or top 10% of entire dataset))K
-        is_classified_positive = mean >= THRESHOLD
-        unseen_data_y = loader.y(unseen_data)
-        is_hit = is_classified_positive & (unseen_data_y == 1)
-
+        # 3.4 compute the success metric (number of 'hits', positive examples that are above the threshold (or top 10% of entire dataset))
+        y_hat = mean >= THRESHOLD
+        is_hit = y_hat & y
         num_hits = is_hit.sum()
-        positive_class_count_in_unseen = loader.y(unseen_data).sum()
-        print(f"[{acquisition_function_name}] number of hits: {num_hits}", f"number of positive examples in unseen: {positive_class_count_in_unseen}")
+
+        print(f"[{acquisition_function_name}] number of hits: {num_hits}")
 
         results.append(Result(
             batch_number=batch_num,
             num_hits=num_hits,
-            positive_class_count_in_unseen=positive_class_count_in_unseen,
         ))
-
     
         # 3.5. get the top 100 candidates from the acquisition function and add them to the active learning dataset
         additional_args = {
@@ -60,10 +58,11 @@ def test_acquisition_function(
             "xi_factor": xi_factor,
             "beta": beta,
         }
-        top_candidates = optimize_acquisition_function(acquisition_function,
-                                                        mean,
-                                                        uncertainty,
-                                                        n_results=100,
+        top_candidates = optimize_acquisition_function(acquisition_function=acquisition_function,
+                                                        mean=mean,
+                                                        uncertainty=uncertainty,
+                                                        active_dataset=active_dataset,
+                                                        max_num_results=100,
                                                         **additional_args)
 
         # 3.6 update the active learning dataset
