@@ -1,7 +1,7 @@
 """ This file contains the Upper Confidence Bound acquisition function. """
 import numpy as np
 
-def upper_confidence_bound(mean: np.ndarray, uncertainty: np.ndarray, beta: float) -> np.ndarray:
+def upper_confidence_bound(mean: np.ndarray, uncertainty: np.ndarray, beta: float, **kwargs) -> np.ndarray:
     """
     Compute the Upper Confidence Bound acquisition function.
     :param mean: Mean of the Gaussian process predictions.

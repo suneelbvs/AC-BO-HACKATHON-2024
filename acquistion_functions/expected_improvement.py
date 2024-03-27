@@ -2,7 +2,7 @@
 import numpy as np
 from scipy.stats import norm
 
-def expected_improvement(mean: np.ndarray, uncertainty: np.ndarray, best_observed_value: float, xi_factor: float) -> np.ndarray:
+def expected_improvement(mean: np.ndarray, uncertainty: np.ndarray, best_observed_value: float, xi_factor: float, **kwargs) -> np.ndarray:
     """
     Compute the Expected Improvement acquisition function.
     :param mean: Mean of the Gaussian process predictions.

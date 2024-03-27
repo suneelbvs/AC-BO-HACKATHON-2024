@@ -1,4 +1,4 @@
-from acquistion_functions import optimize_acquisition_function, probability_of_improvement_acquisition, greedy_acquisition
+from acquistion_functions import optimize_acquisition_function, probability_of_improvement_acquisition, greedy_acquisition, expected_improvement_acquisition, random_acquisition, upper_confidence_bound_acquisition
 from data_loaders.dataset import DataLoader
 from models import XGBoostModel
 from data_loaders.tox21 import Tox21
@@ -10,6 +10,10 @@ from visualizers.visualize_model_progress import visualize_hits
 
 NUM_ACTIVE_LEARNING_LOOPS = 5
 THRESHOLD = 0.02
+
+# Parameters for acquisition functions
+xi_factor = 0.5 # for Expected Improvement
+beta = 0.5 # for Upper Confidence Bound
 
 def test_acquisition_function(
         *,
@@ -52,7 +56,9 @@ def test_acquisition_function(
     
         # 3.5. get the top 100 candidates from the acquisition function and add them to the active learning dataset
         additional_args = {
-            "best_observed_value": best_observed_value
+            "best_observed_value": best_observed_value,
+            "xi_factor": xi_factor,
+            "beta": beta,
         }
         top_candidates = optimize_acquisition_function(acquisition_function,
                                                         mean,
@@ -74,8 +80,11 @@ if __name__ == "__main__":
     active_dataset = np.arange(0, initial_dataset_size//20) # TODO: randomize the indices?
 
     acquisition_functions = [
-        (probability_of_improvement_acquisition, "Probability of Improvement"),
+        (expected_improvement_acquisition, "Expected Improvement"),
         (greedy_acquisition, "Greedy"),
+        (probability_of_improvement_acquisition, "Probability of Improvement"),
+        (random_acquisition, "Random"),
+        (upper_confidence_bound_acquisition, "Upper Confidence Bound"),
     ] 
 
     model = XGBoostModel()
