@@ -61,5 +61,5 @@ Task items:
 ### Installation
 To install an editable version of the package, run the following command:
 ```bash
-pip install -e .
+pip install -r requirements.txt
 ```

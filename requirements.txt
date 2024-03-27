@@ -1,0 +1,13 @@
+numpy
+pandas
+xgboost
+PyTDC
+jupyter
+ipython
+matplotlib
+gpytorch
+torch
+scikit-learn
+scipy
+mordred
+rdkit
