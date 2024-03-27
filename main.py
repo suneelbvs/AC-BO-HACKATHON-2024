@@ -1,7 +1,10 @@
 from acquistion_functions import optimize, probability_of_improvement
 from models import XGBoostModel
 from data_loaders.tox21 import Tox21
+from results import Result
 import numpy as np
+
+from visualizers.visualize_model_progress import visualize_hits
 
 if __name__ == "__main__":
     NUM_ACTIVE_LEARNING_LOOPS = 5
@@ -18,9 +21,10 @@ if __name__ == "__main__":
     active_dataset = np.arange(0, initial_dataset_size//20) # TODO: randomize the indices?
 
     acquisition_function = probability_of_improvement.probability_of_improvement
+    results: [Result] = []
 
     # 3: carry out the active learning loop for N times
-    for i in range(NUM_ACTIVE_LEARNING_LOOPS):
+    for batch_num in range(1, NUM_ACTIVE_LEARNING_LOOPS + 1):
         print(f"active_dataset size: ", len(active_dataset))
         # 3.1 update global parameters needed for acquisition functions
         best_observed_value = loader.y(active_dataset).max()
@@ -38,8 +42,14 @@ if __name__ == "__main__":
         is_hit = is_classified_positive & (unseen_data_y == 1)
 
         num_hits = is_hit.sum()
-        positive_class_count = loader.y(unseen_data).sum()
-        print(f"number of hits: {num_hits}", f"number of positive examples in unseen: {positive_class_count}")
+        positive_class_count_in_unseen = loader.y(unseen_data).sum()
+        print(f"number of hits: {num_hits}", f"number of positive examples in unseen: {positive_class_count_in_unseen}")
+
+        results.append(Result(
+            batch_number=batch_num,
+            num_hits=num_hits,
+            positive_class_count_in_unseen=positive_class_count_in_unseen
+        ))
 
     
         # 3.5. get the top 100 candidates from the acquisition function and add them to the active learning dataset
@@ -53,6 +63,7 @@ if __name__ == "__main__":
         active_dataset = np.concatenate([active_dataset, top_candidates])
     
     # 4: save everything
+    visualize_hits(results)
     
 
 
