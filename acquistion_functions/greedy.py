@@ -1,7 +1,7 @@
 """ This file contains the Greedy acquisition function. """
 import numpy as np
 
-def greedy(mean: np.ndarray, uncertainty: np.ndarray) -> np.ndarray:
+def greedy(mean: np.ndarray, uncertainty: np.ndarray, **kwargs) -> np.ndarray:
     """
     Compute the Greedy acquisition function.
     This function corresponds to the mean.

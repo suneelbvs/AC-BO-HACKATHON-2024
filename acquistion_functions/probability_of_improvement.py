@@ -2,7 +2,7 @@
 import numpy as np
 from scipy.stats import norm
 
-def probability_of_improvement(mean: np.ndarray, uncertainty: np.ndarray, best_observed_value: float) -> np.ndarray:
+def probability_of_improvement(mean: np.ndarray, uncertainty: np.ndarray, best_observed_value: float, **kwargs) -> np.ndarray:
     """
     Compute the Probability of Improvement acquisition function.
     :param mean: Mean of the Gaussian process predictions.

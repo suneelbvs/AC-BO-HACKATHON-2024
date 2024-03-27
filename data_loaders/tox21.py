@@ -1,7 +1,6 @@
 from tdc.utils import retrieve_label_name_list
 from tdc.single_pred import Tox
 import numpy as np
-import pandas as pd
 
 from data_loaders.dataset import DataLoader
 
