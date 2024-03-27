@@ -1,6 +1,7 @@
 from acquistion_functions import optimize, probability_of_improvement
 from models import XGBoostModel
 from data_loaders.tox21 import Tox21
+from results import Result
 import numpy as np
 
 if __name__ == "__main__":
@@ -18,6 +19,7 @@ if __name__ == "__main__":
     active_dataset = np.arange(0, initial_dataset_size//20) # TODO: randomize the indices?
 
     acquisition_function = probability_of_improvement.probability_of_improvement
+    results: [Result] = []
 
     # 3: carry out the active learning loop for N times
     for i in range(NUM_ACTIVE_LEARNING_LOOPS):
@@ -38,8 +40,14 @@ if __name__ == "__main__":
         is_hit = is_classified_positive & (unseen_data_y == 1)
 
         num_hits = is_hit.sum()
-        positive_class_count = loader.y(unseen_data).sum()
-        print(f"number of hits: {num_hits}", f"number of positive examples in unseen: {positive_class_count}")
+        positive_class_count_in_unseen = loader.y(unseen_data).sum()
+        print(f"number of hits: {num_hits}", f"number of positive examples in unseen: {positive_class_count_in_unseen}")
+
+        results.append(Result(
+            batch_number=i,
+            num_hits=num_hits,
+            positive_class_count_in_unseen=positive_class_count_in_unseen
+        ))
 
     
         # 3.5. get the top 100 candidates from the acquisition function and add them to the active learning dataset
