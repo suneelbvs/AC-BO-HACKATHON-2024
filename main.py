@@ -5,22 +5,23 @@ import numpy as np
 
 if __name__ == "__main__":
     NUM_ACTIVE_LEARNING_LOOPS = 5
-    THRESHOLD = 0.5
+    THRESHOLD = 0.02
 
     # 1: load the fingerprint + label data + set the threshold for the succes metric
     loader = Tox21()
-    print(f"loaded {loader.name} dataset")
+    initial_dataset_size = loader.size()
+    print(f"loaded {loader.name} dataset. num entries: {initial_dataset_size}")
 
     model = XGBoostModel()
 
     # 2: initialize the model + initialise the first 100 data points from the dataset
-    initial_dataset_size = loader.size()
     active_dataset = np.arange(0, initial_dataset_size//20) # TODO: randomize the indices?
 
     acquisition_function = probability_of_improvement.probability_of_improvement
 
     # 3: carry out the active learning loop for N times
     for i in range(NUM_ACTIVE_LEARNING_LOOPS):
+        print(f"active_dataset size: ", len(active_dataset))
         # 3.1 update global parameters needed for acquisition functions
         best_observed_value = loader.y(active_dataset).max()
 
@@ -38,7 +39,7 @@ if __name__ == "__main__":
 
         num_hits = is_hit.sum()
         positive_class_count = loader.y(unseen_data).sum()
-        print(f"number of hits: {num_hits}", f"total number of positive examples: {positive_class_count}")
+        print(f"number of hits: {num_hits}", f"number of positive examples in unseen: {positive_class_count}")
 
     
         # 3.5. get the top 100 candidates from the acquisition function and add them to the active learning dataset
