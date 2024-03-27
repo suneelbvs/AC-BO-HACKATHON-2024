@@ -26,6 +26,7 @@ dependencies = [
     "gpytorch",
     "torch",
     "scikit-learn",
+    "scipy",
 ]
 
 [tool.pylint.'MESSAGES CONTROL']
