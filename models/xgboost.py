@@ -22,18 +22,16 @@ class XGBoostModel:
 
     def fit(self, data_x, data_y):
         for i in range(self.num_models):
+            # Init a random seed for each model so we can get multiple predictions and calculate the variance of our model
             self.params["random_state"] = SEED + i
             model = XGBRegressor(**self.params)
             model.fit(data_x, data_y)
             self.models.append(model)
 
     def predict(self, test_X):
-        means = np.ndarray((self.num_models, test_X.shape[0]))
-        variances = []
+        predictions = np.empty((self.num_models, test_X.shape[0]))
         for i in range(self.num_models):
-            model = self.models[i]
-            if i == 0:
-                mean = model.predict(test_X)
-            else:
-                mean += model.predict(test_X)
-        return variances
+            predictions[i] = self.models[i].predict(test_X)
+        mean = np.mean(predictions, axis=-1)
+        variance = np.var(predictions, axis=-1)
+        return mean, variance
