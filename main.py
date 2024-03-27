@@ -6,7 +6,7 @@ if __name__ == "__main__":
     NUM_ACTIVE_LEARNING_LOOPS = 5
     # 1: load the fingerprint + label data + set the threshold for the succes metric
     data_loader = Tox21()
-    print(f"loaded {data_loader.name}")
+    print(f"loaded {data_loader.name} dataset")
 
     model = XGBoostModel()
 
