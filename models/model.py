@@ -2,25 +2,28 @@ import numpy as np
 from typing import Any
 
 class Model:
-    def __init__():
+
+    def __init__(self):
         pass
 
-    def fit(train_x: np.ndarray, train_y: np.ndarray):
+    def fit(self, train_x: np.ndarray, train_y: np.ndarray):
         pass
 
-    def predict(test_x: np.ndarray) -> (np.ndarray, np.ndarray): # mean, variance
+    def predict(self, test_x: np.ndarray) -> tuple[np.ndarray, np.ndarray]: # mean, variance
         pass
 
 
 class ModelTrainer():
-    def __init__(self, data_X: np.ndarray, data_Y: np.ndarray, model: Model, acquisition_function: Any):
-        self.X = data_X
-        self.Y = data_Y
+
+    def __init__(self, data_x: np.ndarray, data_y: np.ndarray, model: Model, acquisition_function: Any):
+        self.x = data_x
+        self.y = data_y
         self.model = model
 
-        self.active_dataset = np.empty()
+        self.active_dataset = []
         self.acquisition_function = acquisition_function
 
     def train_model(self):
         # TODO: perform iterative dataset selection
-        self.model.fit(self.X, self.Y)
+        # self.model.fit(self.X, self.Y)
+        pass
