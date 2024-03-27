@@ -23,7 +23,11 @@ Upon reviewing the dataset for property distribution, it was observed that the c
 These filters were chosen to focus on compounds with properties that are more typical of drug-like molecules, thereby enhancing the relevance of the dataset for predictive modeling and drug design.
 
 ## Data Statistics
-(Include data statistics here, such as number of compounds after filtering, distribution of properties, etc.)
+| Dataset             | Total Compounds | Number of 0s | Number of 1s |
+|---------------------|-----------------|--------------|--------------|
+| Original Data       | 306,893         | 293,149      | 13,744       |
+| Cleaned Dataset     | 288,787         | 275,880      | 12,907       |
+
 
 # AMES Mutagenicity (Source: TDC)
 
