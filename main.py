@@ -21,17 +21,17 @@ if __name__ == "__main__":
 
     # 3: carry out the active learning loop for N times
     for i in range(NUM_ACTIVE_LEARNING_LOOPS):
-        # 3.0.1 update global parameters needed for acquisition functions
+        # 3.1 update global parameters needed for acquisition functions
         best_observed_value = loader.y(active_dataset).max()
 
-        # 3.1 train the surrogate model from model.py on the active learning dataset
+        # 3.2 train the surrogate model from model.py on the active learning dataset
         model.fit(loader.x(active_dataset), loader.y(active_dataset))
 
-        # 3.2 run the surrogate model over the unseen dataset and get predicted values for endpoints
+        # 3.3 run the surrogate model over the unseen dataset and get predicted values for endpoints
         unseen_data = np.setdiff1d(np.arange(0, initial_dataset_size), active_dataset)
         mean, uncertainty = model.predict(loader.x(unseen_data))
 
-        # 3.3 compute the success metric (number of 'hits', positive examples that are above the threshold (or top 10% of entire dataset))K
+        # 3.4 compute the success metric (number of 'hits', positive examples that are above the threshold (or top 10% of entire dataset))K
         is_classified_positive = mean >= THRESHOLD
         unseen_data_y = loader.y(unseen_data)
         is_hit = is_classified_positive & (unseen_data_y == 1)
@@ -41,7 +41,7 @@ if __name__ == "__main__":
         print(f"number of hits: {num_hits}", f"total number of positive examples: {positive_class_count}")
 
     
-        # 3.4. get the top 100 candidates from the acquisition function and add them to the active learning dataset
+        # 3.5. get the top 100 candidates from the acquisition function and add them to the active learning dataset
         top_candidates = optimize.optimize(acquisition_function,
                                                mean,
                                                uncertainty,
