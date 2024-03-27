@@ -1,6 +1,14 @@
 """ A module containing a collection of different acquisition functions for Bayesian optimization. """
-from .expected_improvement import expected_improvement
-from .upper_confidence_bound import upper_confidence_bound
-from .probability_of_improvement import probability_of_improvement
+from .expected_improvement import expected_improvement as expected_improvement_acquisition
+from .upper_confidence_bound import upper_confidence_bound as upper_confidence_bound_acquisition
+from .probability_of_improvement import probability_of_improvement as probability_of_improvement_acquisition
+from .greedy import greedy as greedy_acquisition
+from .random import random as random_acquisition
 
-__all__ = ["expected_improvement", "upper_confidence_bound"]
+__all__ = [
+    "expected_improvement_acquisition",
+    "upper_confidence_bound_acquisition",
+    "probability_of_improvement_acquisition",
+    "greedy_acquisition",
+    "random_acquisition",
+]
