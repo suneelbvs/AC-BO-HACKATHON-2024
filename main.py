@@ -6,6 +6,21 @@ from model import ModelTrainer
 from dataset import Dataset
 from params import xgboost_params
 
+from tdc.utils import retrieve_label_name_list
+from xgboost import XGBRegressor
+from sklearn.model_selection import StratifiedKFold
+from sklearn.metrics import mean_squared_error
+import numpy as np
+from tdc.single_pred import Tox
+
+
+# HACK: to get dataset
+label_list = retrieve_label_name_list('Tox21')
+data = Tox(name = 'Tox21', label_name = label_list[0])
+split = data.get_split()
+test = split['test']
+train = split['train']
+
 
 if __name__ == "__main__":
     # params
