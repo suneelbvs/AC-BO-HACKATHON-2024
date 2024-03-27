@@ -42,3 +42,18 @@ AC-BO-HACKATHON-2024/
 └── applicability_domain/
     ├── <Applicability domain assessment methods>
 ```
+
+# Names added random; please feel free to edit.
+Task items:
+| Task Item                   | Team Member          | Package/Tool       |
+|-----------------------------|----------------------|--------------------|
+| Dataset Selection           | Jan Christopher Spies| N/A                |
+| Data Preparation            | Yunheng Zou          | RDKit, OpenBabel   |
+| Data Featurization          |                      |                    |
+| - Fingerprints              | Jakub Lála           | RDKit              |
+| - Graph                     | Luis Walter          | DeepChem           |
+| ML Models                   | Curtis Chong         | Scikit-learn       |
+| DL Models                   | Jakub Lála           | PyTorch            |
+| Metrics                     | Yunheng Zou          | Scikit-learn       |
+| Applicability Domain (AOD)  | Luis Walter          | Scikit-learn       |
+| Plotting                    | Jan Christopher Spies| Matplotlib         |
