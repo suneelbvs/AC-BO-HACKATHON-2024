@@ -22,7 +22,7 @@ def test_acquisition_function(
         acquisition_function: Callable,
         acquisition_function_name: str,
 ) -> [Result]:
-    entire_dataset = np.arange(0, loader.size()) # PERF: this slow
+    entire_dataset = np.arange(0, loader.size()) # PERF: if the dataset is much larger, this way of indexing could be slow
     active_dataset = initial_dataset
     results: [Result] = []
 
