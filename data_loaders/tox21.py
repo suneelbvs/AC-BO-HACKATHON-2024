@@ -13,14 +13,14 @@ class Tox21(DataLoader):
 
         # TODO: use real features
         data["num_oxygen"] = data["Drug"].str.count("O")
-        self.data = data[:5]
+        self.data = data
         self.name = "Tox21"
 
-    def full_dataset(self):
-        return self.data
+    def size(self):
+        return len(self.data)
 
-    def x(self, dataset_slice: pd.DataFrame) -> np.ndarray:
-        return np.expand_dims(dataset_slice["num_oxygen"].to_numpy(), 1)
+    def x(self, dataset_slice_indices: np.ndarray) -> np.ndarray:
+        return np.expand_dims(self.data.iloc[dataset_slice_indices]["num_oxygen"].to_numpy(), 1)
 
-    def y(self, dataset_slice):
-        return dataset_slice["Y"].to_numpy()
+    def y(self, dataset_slice_indices):
+        return self.data.iloc[dataset_slice_indices]["Y"].to_numpy()

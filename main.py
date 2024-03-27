@@ -1,7 +1,7 @@
 from acquistion_functions import optimize, probability_of_improvement
 from models import XGBoostModel
 from data_loaders.tox21 import Tox21
-
+import numpy as np
 
 if __name__ == "__main__":
     NUM_ACTIVE_LEARNING_LOOPS = 5
@@ -13,13 +13,11 @@ if __name__ == "__main__":
 
     model = XGBoostModel()
 
-    full_dataset = loader.full_dataset()
-
     # 2: initialize the model + initialise the first 100 data points from the dataset
-    initial_dataset_size = full_dataset.shape[0]
-    active_dataset = full_dataset[:initial_dataset_size] # TODO: randomly shuffle the data?
+    initial_dataset_size = loader.size()
+    active_dataset = np.arange(0, initial_dataset_size//20) # TODO: randomize the indices?
 
-    acquisition_function = probability_of_improvement
+    acquisition_function = probability_of_improvement.probability_of_improvement
 
     # 3: carry out the active learning loop for N times
     for i in range(NUM_ACTIVE_LEARNING_LOOPS):
@@ -30,7 +28,7 @@ if __name__ == "__main__":
         model.fit(loader.x(active_dataset), loader.y(active_dataset))
 
         # 3.2 run the surrogate model over the unseen dataset and get predicted values for endpoints
-        unseen_data = full_dataset[~full_dataset.index.isin(active_dataset.index)]
+        unseen_data = np.setdiff1d(np.arange(0, initial_dataset_size), active_dataset)
         mean, uncertainty = model.predict(loader.x(unseen_data))
 
         # 3.3 compute the success metric (number of 'hits', positive examples that are above the threshold (or top 10% of entire dataset))K
@@ -44,13 +42,14 @@ if __name__ == "__main__":
 
     
         # 3.4. get the top 100 candidates from the acquisition function and add them to the active learning dataset
-        top_candidate_indexes = optimize(acquisition_function,
+        top_candidates = optimize.optimize(acquisition_function,
                                                mean,
                                                uncertainty,
+                                               n_results=100,
                                                best_observed_value=best_observed_value)
 
         # 3.6 update the active learning dataset
-        active_dataset.append(unseen_data.iloc[top_candidate_indexes])
+        active_dataset = np.concatenate([active_dataset, top_candidates])
     
     # 4: save everything
     
