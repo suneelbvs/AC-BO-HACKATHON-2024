@@ -49,6 +49,7 @@ class RegressionHighestYResultTracker(ResultTracker):
             y_axis=best_actual_y,
         ))
 
+# given the candidates in the active dataset, how many NEW candidates (that are going to be added in the next batch) are better
 class RegressionNumBetterCandidatesResultTracker(ResultTracker):
     y_label = "Num Better Candidates"
     def __init__(self):
