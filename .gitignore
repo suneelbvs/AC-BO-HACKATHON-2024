@@ -2,8 +2,8 @@ venv/
 data/
 out/
 
-.ipynb_checkpoints/
-__pycache__/
+*.ipynb_checkpoints/
+*__pycache__/
 
 .vscode
 .DS_Store
