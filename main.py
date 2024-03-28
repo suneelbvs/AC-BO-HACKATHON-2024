@@ -7,6 +7,7 @@ from data_loaders.tox21 import Tox21
 from models import XGBoostModel
 from models.gaussian_process import GaussianProcessModel
 from models.model import Model
+from models.random_forest import RandomForestModel
 from results import RegressionHighestYResultTracker, RegressionNumBetterCandidatesResultTracker, RegressionNumOver90PercentileResultTracker, ResultTracker
 import numpy as np
 from typing import Callable
@@ -15,7 +16,7 @@ import math
 from visualizers.visualize_model_progress import visualize_results
 
 NUM_ACTIVE_LEARNING_LOOPS = 20
-NUM_NEW_CANDIDATES_PER_BATCH = 4 # papers show that 4 new candidates is good (prob because collecting data is expensive)
+NUM_NEW_CANDIDATES_PER_BATCH = 20 # papers show that 4 new candidates is good (prob because collecting data is expensive)
 
 # Parameters for acquisition functions
 xi_factor = 0.5 # for Expected Improvement
@@ -100,7 +101,7 @@ if __name__ == "__main__":
     result_tracker = RegressionNumOver90PercentileResultTracker()
 
     # model = XGBoostModel()
-    model = GaussianProcessModel()
+    model = RandomForestModel()
     for acquisition_function, name in acquisition_functions:
         test_acquisition_function(
             model=model,
