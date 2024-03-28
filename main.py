@@ -1,7 +1,7 @@
 from acquistion_functions import optimize_acquisition_function, probability_of_improvement_acquisition, greedy_acquisition, expected_improvement_acquisition, random_acquisition, upper_confidence_bound_acquisition
+from data_loaders.ames import Ames
 from data_loaders.dataset import DataLoader
 from models import XGBoostModel
-from data_loaders.tox21 import Tox21
 from results import Result
 import numpy as np
 from typing import Callable, Dict
@@ -71,7 +71,8 @@ def test_acquisition_function(
 
 if __name__ == "__main__":
     # 1: load the fingerprint + label data + set the threshold for the succes metric
-    loader = Tox21()
+    # loader = Tox21()
+    loader = Ames()
     initial_dataset_size = loader.size()
     print(f"loaded {loader.name} dataset. num entries: {initial_dataset_size}")
 
