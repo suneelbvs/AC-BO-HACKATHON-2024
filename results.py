@@ -41,9 +41,22 @@ def get_regression_results_num_better_candidates(*, loader: DataLoader, active_d
     top_candidates_ys = loader.y(top_candidates)
 
     num_candidates_better_than_active_dataset = np.count_nonzero(top_candidates_ys > active_dataset_ys.max())
-    print(f"[{acquisition_function_name}] batch_num: {batch_num}, num_better_candidates: {len(num_candidates_better_than_active_dataset)}")
+    print(f"[{acquisition_function_name}] batch_num: {batch_num}, num_better_candidates: {num_candidates_better_than_active_dataset}")
 
     return Result(
         batch_number=batch_num,
         y_axis=num_candidates_better_than_active_dataset,
+    )
+
+def get_regression_results_num_over_200(*, loader: DataLoader, active_dataset: np.ndarray, top_candidates: np.ndarray,
+                                                 batch_num:int, acquisition_function_name: str, **kwargs) -> Result:
+    active_dataset_ys = loader.y(active_dataset)
+    top_candidates_ys = loader.y(top_candidates)
+
+    num_candidates_over_200 = np.count_nonzero(active_dataset_ys > 200) + np.count_nonzero(top_candidates_ys > 200)
+    print(f"[{acquisition_function_name}] batch_num: {batch_num}, num_over_200: {num_candidates_over_200}")
+
+    return Result(
+        batch_number=batch_num,
+        y_axis=num_candidates_over_200,
     )

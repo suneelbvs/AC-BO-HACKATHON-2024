@@ -6,14 +6,14 @@ from data_loaders.tox21 import Tox21
 from models import XGBoostModel
 from models.gaussian_process import GaussianProcessModel
 from models.model import Model
-from results import Result, get_regression_results_highest_y
+from results import Result, get_regression_results_highest_y, get_regression_results_num_better_candidates, get_regression_results_num_over_200
 import numpy as np
 from typing import Callable, Dict
 import math
 
 from visualizers.visualize_model_progress import visualize_hits
 
-NUM_ACTIVE_LEARNING_LOOPS = 10
+NUM_ACTIVE_LEARNING_LOOPS = 60
 NUM_NEW_CANDIDATES_PER_BATCH = 4 # papers show that 4 new candidates is good (prob because collecting data is expensive)
 
 # Parameters for acquisition functions
@@ -97,10 +97,11 @@ if __name__ == "__main__":
         (upper_confidence_bound_acquisition, "Upper Confidence Bound"),
     ] 
 
-    result_creator = get_regression_results_highest_y
+    # result_creator = get_regression_results_highest_y
+    result_creator = get_regression_results_num_better_candidates
 
-    model = XGBoostModel()
-    # model = GaussianProcessModel()
+    # model = XGBoostModel()
+    model = GaussianProcessModel()
     optimization_results: Dict[str, Result] = {}
     for acquisition_function, name in acquisition_functions:
         optimization_results[name] = test_acquisition_function(

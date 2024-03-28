@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from results import Result, get_classification_results, get_regression_results_highest_y, get_regression_results_num_better_candidates
+from results import Result, get_classification_results, get_regression_results_highest_y, get_regression_results_num_better_candidates, get_regression_results_num_over_200
 from typing import Callable, Dict
 from pathlib import Path
 
@@ -10,6 +10,8 @@ def get_ylabel(result_creator: Callable[..., Result]) -> str:
         return 'Num Better Candidates'
     elif result_creator == get_regression_results_highest_y:
         return 'Best Actual Y'
+    elif result_creator == get_regression_results_num_over_200:
+        return 'Num Over 200'
     else:
         raise ValueError("Unknown result creator")
 
