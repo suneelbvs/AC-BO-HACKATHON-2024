@@ -7,6 +7,7 @@ from data_loaders.tox21 import Tox21
 from models import XGBoostModel
 from models.gaussian_process import GaussianProcessModel
 from models.model import Model
+from models.random_forest import RandomForestModel
 from results import RegressionHighestYResultTracker, RegressionNumBetterCandidatesResultTracker, RegressionNumOver90PercentileResultTracker, ResultTracker
 import numpy as np
 from typing import Callable
@@ -100,7 +101,7 @@ if __name__ == "__main__":
     result_tracker = RegressionNumOver90PercentileResultTracker()
 
     # model = XGBoostModel()
-    model = GaussianProcessModel()
+    model = RandomForestModel()
     for acquisition_function, name in acquisition_functions:
         test_acquisition_function(
             model=model,
