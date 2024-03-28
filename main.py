@@ -9,7 +9,7 @@ from typing import Callable, Dict
 from visualizers.visualize_model_progress import visualize_hits
 
 NUM_ACTIVE_LEARNING_LOOPS = 5
-THRESHOLD = 0.02
+THRESHOLD = 0.01
 
 # Parameters for acquisition functions
 xi_factor = 0.5 # for Expected Improvement

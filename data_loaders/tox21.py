@@ -11,19 +11,19 @@ class Tox21(DataLoader):
         self.data = Tox(name = 'Tox21', label_name = label_list[0]).get_data()
 
         # TODO: use real features
-        #self.transformer = FingerprintsTransformer(self.data,"Drug", "ECFP")
+        self.transformer = FingerprintsTransformer(self.data,"Drug", "ECFP")
         
-        self.data["num_oxygen"] = self.data["Drug"].str.count("O")
+        #self.data["num_oxygen"] = self.data["Drug"].str.count("O")
         self.name = "Tox21"
 
     def size(self):
         return len(self.data)
 
-    def x(self, dataset_slice_indices: np.ndarray) -> np.ndarray:
-        return np.expand_dims(self.data.iloc[dataset_slice_indices]["num_oxygen"].to_numpy(), 1)
-
     # def x(self, dataset_slice_indices: np.ndarray) -> np.ndarray:
-    #     return self.transformer.to_np()[dataset_slice_indices]
+    #     return np.expand_dims(self.data.iloc[dataset_slice_indices]["num_oxygen"].to_numpy(), 1)
+
+    def x(self, dataset_slice_indices: np.ndarray) -> np.ndarray:
+        return self.transformer.to_np()[dataset_slice_indices]
 
     def y(self, dataset_slice_indices):
         return self.data.iloc[dataset_slice_indices]["Y"].to_numpy()
