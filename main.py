@@ -5,7 +5,7 @@ from data_loaders.halflife import halflife
 from data_loaders.tox21 import Tox21
 from models import XGBoostModel
 from models.gaussian_process import GaussianProcessModel
-from results import Result, get_regression_results_highest_y, get_regression_results_num_better_candidates
+from results import Result, get_regression_results_highest_y
 import numpy as np
 from typing import Callable, Dict
 
@@ -24,6 +24,7 @@ def test_acquisition_function(
         loader: DataLoader,
         initial_dataset: np.ndarray,
         acquisition_function: Callable,
+        result_creator: Callable[..., Result],
         acquisition_function_name: str,
 ) -> [Result]:
     entire_dataset = np.arange(0, loader.size()) # PERF: if the dataset is much larger, this way of indexing could be slow
@@ -58,9 +59,17 @@ def test_acquisition_function(
                                                         **additional_args)
 
         # 3.5 compute the success metric (number of 'hits', positive examples that are above the threshold (or top 10% of entire dataset))
-        # results.append(get_classification_results(mean, y, batch_num, acquisition_function_name))
-        results.append(get_regression_results_highest_y(loader, active_dataset, top_candidates, batch_num, acquisition_function_name))
-        # results.append(get_regression_results_num_better_candidates(loader, active_dataset, top_candidates, batch_num, acquisition_function_name))
+        result_creator_args = {
+            "mean": mean,
+            "y": y,
+            "loader": loader,
+            "active_dataset": active_dataset,
+            "top_candidates": top_candidates,
+            "batch_num": batch_num,
+            "acquisition_function_name": acquisition_function_name,
+        }
+
+        results.append(result_creator(**result_creator_args))
 
         # 3.6 update the active learning dataset
         active_dataset = np.concatenate([active_dataset, top_candidates])
@@ -84,6 +93,8 @@ if __name__ == "__main__":
         (upper_confidence_bound_acquisition, "Upper Confidence Bound"),
     ] 
 
+    result_creator = get_regression_results_highest_y
+
     # model = XGBoostModel()
     model = GaussianProcessModel()
     optimization_results: Dict[str, Result] = {}
@@ -92,7 +103,8 @@ if __name__ == "__main__":
             loader=loader,
             initial_dataset=np.copy(active_dataset),
             acquisition_function=acquisition_function,
+            result_creator=result_creator,
             acquisition_function_name=name)
 
     # 4: save everything
-    visualize_hits(optimization_results)
+    visualize_hits(optimization_results, result_creator)
