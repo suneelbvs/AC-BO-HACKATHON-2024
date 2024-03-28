@@ -27,9 +27,7 @@ class Ames(DataLoader):
     
     @lru_cache
     def hit_threshold(self):
-        sorted_y_values = np.sort(self.y_values)
-        hit_threshold = np.percentile(sorted_y_values, 90)
-        return hit_threshold
+        return 0.5 # binary classification
 
     def x(self, dataset_slice: slice | np.ndarray = None) -> np.ndarray:
         if dataset_slice is None:
