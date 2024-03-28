@@ -51,17 +51,21 @@ class RegressionHighestYResultTracker(ResultTracker):
 
 class RegressionNumBetterCandidatesResultTracker(ResultTracker):
     y_label = "Num Better Candidates"
+    def __init__(self):
+        super().__init__()
+        self.cumulative_num_better_candidates = defaultdict(int)
 
     def add_result(self, *, loader: DataLoader, active_dataset: np.ndarray, top_candidates: np.ndarray, batch_num:int, acquisition_function_name: str, **kwargs):
         active_dataset_ys = loader.y(active_dataset)
         top_candidates_ys = loader.y(top_candidates)
 
         num_candidates_better_than_active_dataset = np.count_nonzero(top_candidates_ys > active_dataset_ys.max())
-        print(f"[{acquisition_function_name}] batch_num: {batch_num}, num_better_candidates: {num_candidates_better_than_active_dataset}")
+        self.cumulative_num_better_candidates[acquisition_function_name] += num_candidates_better_than_active_dataset
+        print(f"[{acquisition_function_name}] batch_num: {batch_num}, num_better_candidates: {self.cumulative_num_better_candidates[acquisition_function_name]}")
 
         self.results[acquisition_function_name].append(Result(
             batch_number=batch_num,
-            y_axis=num_candidates_better_than_active_dataset,
+            y_axis=self.cumulative_num_better_candidates[acquisition_function_name],
         ))
 
 class RegressionNumOver200ResultTracker(ResultTracker):

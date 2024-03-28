@@ -6,7 +6,7 @@ from data_loaders.tox21 import Tox21
 from models import XGBoostModel
 from models.gaussian_process import GaussianProcessModel
 from models.model import Model
-from results import RegressionHighestYResultTracker, ResultTracker
+from results import RegressionHighestYResultTracker, RegressionNumBetterCandidatesResultTracker, ResultTracker
 import numpy as np
 from typing import Callable
 import math
@@ -96,7 +96,7 @@ if __name__ == "__main__":
     ] 
 
     # result_creator = get_regression_results_highest_y
-    result_tracker = RegressionHighestYResultTracker()
+    result_tracker = RegressionNumBetterCandidatesResultTracker()
 
     # model = XGBoostModel()
     model = GaussianProcessModel()
