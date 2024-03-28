@@ -3,7 +3,7 @@ from results import Result, ResultTracker
 from typing import Dict
 from pathlib import Path
 
-def visualize_hits(result_tracker: ResultTracker, loader_name: str, model_name:str):
+def visualize_results(result_tracker: ResultTracker, loader_name: str, model_name:str):
     fig, ax = plt.subplots()
 
     # Plot the number of hits for each acquisition function

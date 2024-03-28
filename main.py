@@ -11,7 +11,7 @@ import numpy as np
 from typing import Callable
 import math
 
-from visualizers.visualize_model_progress import visualize_hits
+from visualizers.visualize_model_progress import visualize_results
 
 NUM_ACTIVE_LEARNING_LOOPS = 60
 NUM_NEW_CANDIDATES_PER_BATCH = 4 # papers show that 4 new candidates is good (prob because collecting data is expensive)
@@ -47,21 +47,21 @@ def test_acquisition_function(
         # 3.3 run the surrogate model over the unseen dataset and get predicted values for endpoints
         mean, uncertainty = model.predict(loader.x(entire_dataset))
     
-        # 3.4. get the top 100 candidates from the acquisition function and add them to the active learning dataset
-        additional_args = {
+        # 3.4. get the top candidates from the acquisition function and add them to the active learning dataset
+        optimize_acquisition_function_args = {
+            "acquisition_function":acquisition_function,
+            "mean": mean,
+            "uncertainty": uncertainty,
+            "active_dataset": active_dataset,
+            "max_num_results": NUM_NEW_CANDIDATES_PER_BATCH,
             "best_observed_value": best_observed_value,
             "xi_factor": xi_factor,
             "beta": beta,
         }
-        top_candidates = optimize_acquisition_function(acquisition_function=acquisition_function,
-                                                        mean=mean,
-                                                        uncertainty=uncertainty,
-                                                        active_dataset=active_dataset,
-                                                        max_num_results=NUM_NEW_CANDIDATES_PER_BATCH,
-                                                        **additional_args)
+        top_candidates = optimize_acquisition_function(**optimize_acquisition_function_args)
 
         # 3.5 compute the success metric
-        result_creator_args = {
+        result_tracker_args = {
             "mean": mean,
             "y": y,
             "loader": loader,
@@ -71,7 +71,7 @@ def test_acquisition_function(
             "acquisition_function_name": acquisition_function_name,
         }
 
-        result_tracker.add_result(**result_creator_args)
+        result_tracker.add_result(**result_tracker_args)
 
         # 3.6 update the active learning dataset
         active_dataset = np.concatenate([active_dataset, top_candidates])
@@ -110,4 +110,4 @@ if __name__ == "__main__":
             acquisition_function_name=name)
 
     # 4: save everything
-    visualize_hits(result_tracker, loader.name, model.name)
+    visualize_results(result_tracker, loader.name, model.name)
