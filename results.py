@@ -1,10 +1,3 @@
-from dataclasses import dataclass
-class Main2Result:
-    def __init__(self, batch_number, **kwargs):
-        self.batch_number = batch_number
-        self.metrics = kwargs
-
-
 from collections import defaultdict
 from dataclasses import dataclass
 from typing import DefaultDict, List
