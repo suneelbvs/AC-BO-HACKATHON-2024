@@ -1,6 +1,7 @@
 from acquistion_functions import optimize_acquisition_function, probability_of_improvement_acquisition, greedy_acquisition, expected_improvement_acquisition, random_acquisition, upper_confidence_bound_acquisition
 from data_loaders.ames import Ames
 from data_loaders.dataset import DataLoader
+from data_loaders.halflife import halflife
 from data_loaders.tox21 import Tox21
 from models import XGBoostModel
 from models.gaussian_process import GaussianProcessModel
@@ -11,6 +12,7 @@ from typing import Callable, Dict
 from visualizers.visualize_model_progress import visualize_hits
 
 NUM_ACTIVE_LEARNING_LOOPS = 10
+NUM_NEW_CANDIDATES_PER_BATCH = 10
 
 # Parameters for acquisition functions
 xi_factor = 0.5 # for Expected Improvement
@@ -52,7 +54,7 @@ def test_acquisition_function(
                                                         mean=mean,
                                                         uncertainty=uncertainty,
                                                         active_dataset=active_dataset,
-                                                        max_num_results=100,
+                                                        max_num_results=NUM_NEW_CANDIDATES_PER_BATCH,
                                                         **additional_args)
 
         # 3.5 compute the success metric (number of 'hits', positive examples that are above the threshold (or top 10% of entire dataset))
@@ -66,7 +68,7 @@ def test_acquisition_function(
 
 if __name__ == "__main__":
     # 1: load the fingerprint + label data + set the threshold for the succes metric
-    loader = Tox21()
+    loader = halflife()
     # loader = Ames()
     initial_dataset_size = loader.size()
     print(f"loaded {loader.name} dataset. num entries: {initial_dataset_size}, num_y=1:{loader.y(np.arange(initial_dataset_size)).sum()}")
@@ -75,10 +77,10 @@ if __name__ == "__main__":
     active_dataset = np.arange(0, initial_dataset_size//20) # TODO: randomize the indices?
 
     acquisition_functions = [
-        #(expected_improvement_acquisition, "Expected Improvement"),
+        (expected_improvement_acquisition, "Expected Improvement"),
         (greedy_acquisition, "Greedy"),
-        #(probability_of_improvement_acquisition, "Probability of Improvement"),
-        #(random_acquisition, "Random"),
+        (probability_of_improvement_acquisition, "Probability of Improvement"),
+        (random_acquisition, "Random"),
         (upper_confidence_bound_acquisition, "Upper Confidence Bound"),
     ] 
 
