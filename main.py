@@ -97,8 +97,8 @@ if __name__ == "__main__":
 
     result_creator = get_regression_results_highest_y
 
-    model = XGBoostModel()
-    # model = GaussianProcessModel()
+    # model = XGBoostModel()
+    model = GaussianProcessModel()
     optimization_results: Dict[str, Result] = {}
     for acquisition_function, name in acquisition_functions:
         optimization_results[name] = test_acquisition_function(
@@ -109,4 +109,4 @@ if __name__ == "__main__":
             acquisition_function_name=name)
 
     # 4: save everything
-    visualize_hits(optimization_results, result_creator)
+    visualize_hits(optimization_results, result_creator, loader.name, model.name)

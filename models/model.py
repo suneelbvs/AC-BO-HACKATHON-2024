@@ -2,6 +2,7 @@ from typing import Any
 import numpy as np
 
 class Model:
+    name: int
 
     def __init__(self):
         pass

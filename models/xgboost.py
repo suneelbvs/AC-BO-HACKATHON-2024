@@ -20,6 +20,7 @@ class XGBoostModel(Model):
             'n_jobs': -1,
             'learning_rate':0.023,
         }
+        self.name = "XGBoost"
 
 
     def fit(self, data_x, data_y):

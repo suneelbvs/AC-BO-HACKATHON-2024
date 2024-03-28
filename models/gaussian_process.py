@@ -16,6 +16,7 @@ class GaussianProcessModel(gpytorch.models.ExactGP, Model):
         super().__init__(None, None, likelihood)
         self.mean_module = gpytorch.means.ConstantMean()
         self.covar_module = gpytorch.kernels.ScaleKernel(gpytorch.kernels.RBFKernel())
+        self.name = "Gaussian Process"
 
     def forward(self, x):
         """
