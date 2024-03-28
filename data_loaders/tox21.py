@@ -8,6 +8,8 @@ from functools import lru_cache
 # https://tdcommons.ai/single_pred_tasks/tox/#tox21
 
 class Tox21(DataLoader):
+    fingerprint = 'ECFP'
+
     def __init__(self):
         label_list = retrieve_label_name_list('Tox21')
         data = Tox(name = 'Tox21', label_name = label_list[0]).get_data()
@@ -15,7 +17,6 @@ class Tox21(DataLoader):
         transformer = FingerprintsTransformer(data, "Drug", "ECFP")
 
         self.name = "Tox21"
-        self.fingerprint = 'ECFP'
         self.x_values = transformer.to_np()
         self.y_values = data["Y"].to_numpy()
 

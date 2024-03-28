@@ -7,6 +7,8 @@ from data_loaders.dataset import DataLoader
 from functools import lru_cache
 
 class Ames(DataLoader):
+    fingerprint = 'Mordred'
+    
     def __init__(self):
         # We're using the Mordred fingerprint
         # This dataset was generated using Mordred.py
@@ -18,7 +20,6 @@ class Ames(DataLoader):
         data = pd.read_csv(dataset_dir)
         fingerprint_arrays = data["fingerprint_Mordred"].apply(
             lambda array_str: np.array(ast.literal_eval(array_str))).tolist()
-        self.fingerprint = 'Mordred'
         self.x_values = np.stack(fingerprint_arrays)
         self.y_values = data["Y"].to_numpy()
         self.name = "Ames"

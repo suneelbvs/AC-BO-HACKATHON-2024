@@ -6,6 +6,7 @@ from transformer.fingerprints import FingerprintsTransformer
 from functools import lru_cache
 
 class Halflife(DataLoader):
+    fingerprint = 'ECFP'
 
     def __init__(self):
         path = os.path.join(
@@ -16,7 +17,6 @@ class Halflife(DataLoader):
         transformer = FingerprintsTransformer(self.data, "Drug", "ECFP")
 
         self.name = "halflife"
-        self.fingerprint = 'ECFP'
         self.x_values = transformer.to_np()
         self.y_values = self.data["Y"].to_numpy()
 

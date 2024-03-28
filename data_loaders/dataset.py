@@ -11,6 +11,8 @@ class DataLoader:
 
     def __init__(self):
         """ You should perform feature extraction and data cleaning here """
+        self.name: str = None
+        self.fingerprint: str = None
         pass
 
     def size(self) -> int:
