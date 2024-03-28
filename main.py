@@ -4,18 +4,18 @@ from data_loaders.dataset import DataLoader
 from data_loaders.tox21 import Tox21
 from models import XGBoostModel
 from models.gaussian_process import GaussianProcessModel
-from results import Result
+from results import Result, get_regression_results_highest_y, get_regression_results_num_better_candidates
 import numpy as np
 from typing import Callable, Dict
 
 from visualizers.visualize_model_progress import visualize_hits
 
 NUM_ACTIVE_LEARNING_LOOPS = 10
-THRESHOLD = 0.001
 
 # Parameters for acquisition functions
 xi_factor = 0.5 # for Expected Improvement
 beta = 0.5 # for Upper Confidence Bound
+
 
 def test_acquisition_function(
         *,
@@ -41,21 +41,8 @@ def test_acquisition_function(
 
         # 3.3 run the surrogate model over the unseen dataset and get predicted values for endpoints
         mean, uncertainty = model.predict(loader.x(entire_dataset))
-
-        # 3.4 compute the success metric (number of 'hits', positive examples that are above the threshold (or top 10% of entire dataset))
-        THRESHOLD = np.sort(mean)[-309]
-        y_hat = mean >= THRESHOLD
-        is_hit = y_hat & y
-        num_hits = is_hit.sum()
-
-        print(f"[{acquisition_function_name}] number of hits: {num_hits}")
-
-        results.append(Result(
-            batch_number=batch_num,
-            num_hits=num_hits,
-        ))
     
-        # 3.5. get the top 100 candidates from the acquisition function and add them to the active learning dataset
+        # 3.4. get the top 100 candidates from the acquisition function and add them to the active learning dataset
         additional_args = {
             "best_observed_value": best_observed_value,
             "xi_factor": xi_factor,
@@ -67,6 +54,11 @@ def test_acquisition_function(
                                                         active_dataset=active_dataset,
                                                         max_num_results=100,
                                                         **additional_args)
+
+        # 3.5 compute the success metric (number of 'hits', positive examples that are above the threshold (or top 10% of entire dataset))
+        # results.append(get_classification_results(mean, y, batch_num, acquisition_function_name))
+        results.append(get_regression_results_highest_y(loader, active_dataset, top_candidates, batch_num, acquisition_function_name))
+        # results.append(get_regression_results_num_better_candidates(loader, active_dataset, top_candidates, batch_num, acquisition_function_name))
 
         # 3.6 update the active learning dataset
         active_dataset = np.concatenate([active_dataset, top_candidates])
@@ -99,6 +91,6 @@ if __name__ == "__main__":
             initial_dataset=np.copy(active_dataset),
             acquisition_function=acquisition_function,
             acquisition_function_name=name)
+
     # 4: save everything
     visualize_hits(optimization_results)
-
