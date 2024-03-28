@@ -24,6 +24,7 @@ class XGBoostModel(Model):
 
 
     def fit(self, data_x, data_y):
+        self.models = []
         for i in range(self.num_models):
             # Init a random seed for each model so we can get multiple predictions and calculate the variance of our model
             self.params["random_state"] = SEED + i
