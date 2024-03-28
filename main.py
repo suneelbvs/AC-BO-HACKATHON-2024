@@ -5,6 +5,7 @@ from data_loaders.halflife import halflife
 from data_loaders.tox21 import Tox21
 from models import XGBoostModel
 from models.gaussian_process import GaussianProcessModel
+from models.model import Model
 from results import Result, get_regression_results_highest_y
 import numpy as np
 from typing import Callable, Dict
@@ -22,6 +23,7 @@ beta = 0.5 # for Upper Confidence Bound
 
 def test_acquisition_function(
         *,
+        model: Model,
         loader: DataLoader,
         initial_dataset: np.ndarray,
         acquisition_function: Callable,
@@ -59,7 +61,7 @@ def test_acquisition_function(
                                                         max_num_results=NUM_NEW_CANDIDATES_PER_BATCH,
                                                         **additional_args)
 
-        # 3.5 compute the success metric (number of 'hits', positive examples that are above the threshold (or top 10% of entire dataset))
+        # 3.5 compute the success metric
         result_creator_args = {
             "mean": mean,
             "y": y,
@@ -97,11 +99,12 @@ if __name__ == "__main__":
 
     result_creator = get_regression_results_highest_y
 
-    # model = XGBoostModel()
-    model = GaussianProcessModel()
+    model = XGBoostModel()
+    # model = GaussianProcessModel()
     optimization_results: Dict[str, Result] = {}
     for acquisition_function, name in acquisition_functions:
         optimization_results[name] = test_acquisition_function(
+            model=model,
             loader=loader,
             initial_dataset=np.copy(active_dataset),
             acquisition_function=acquisition_function,
