@@ -6,9 +6,9 @@ from data_loaders.tox21 import Tox21
 from models import XGBoostModel
 from models.gaussian_process import GaussianProcessModel
 from models.model import Model
-from results import Result, get_regression_results_highest_y, get_regression_results_num_better_candidates, get_regression_results_num_over_200
+from results import RegressionHighestYResultTracker, ResultTracker
 import numpy as np
-from typing import Callable, Dict
+from typing import Callable
 import math
 
 from visualizers.visualize_model_progress import visualize_hits
@@ -27,12 +27,11 @@ def test_acquisition_function(
         loader: DataLoader,
         initial_dataset: np.ndarray,
         acquisition_function: Callable,
-        result_creator: Callable[..., Result],
+        result_tracker: ResultTracker,
         acquisition_function_name: str,
-) -> [Result]:
+):
     entire_dataset = np.arange(0, loader.size()) # PERF: if the dataset is much larger, this way of indexing could be slow
     active_dataset = initial_dataset
-    results: [Result] = []
 
     y = loader.y(entire_dataset) == 1
 
@@ -72,11 +71,10 @@ def test_acquisition_function(
             "acquisition_function_name": acquisition_function_name,
         }
 
-        results.append(result_creator(**result_creator_args))
+        result_tracker.add_result(**result_creator_args)
 
         # 3.6 update the active learning dataset
         active_dataset = np.concatenate([active_dataset, top_candidates])
-    return results
 
 if __name__ == "__main__":
     # 1: load the fingerprint + label data + set the threshold for the succes metric
@@ -98,19 +96,18 @@ if __name__ == "__main__":
     ] 
 
     # result_creator = get_regression_results_highest_y
-    result_creator = get_regression_results_num_better_candidates
+    result_tracker = RegressionHighestYResultTracker()
 
     # model = XGBoostModel()
     model = GaussianProcessModel()
-    optimization_results: Dict[str, Result] = {}
     for acquisition_function, name in acquisition_functions:
-        optimization_results[name] = test_acquisition_function(
+        test_acquisition_function(
             model=model,
             loader=loader,
             initial_dataset=np.copy(active_dataset),
             acquisition_function=acquisition_function,
-            result_creator=result_creator,
+            result_tracker=result_tracker,
             acquisition_function_name=name)
 
     # 4: save everything
-    visualize_hits(optimization_results, result_creator, loader.name, model.name)
+    visualize_hits(result_tracker, loader.name, model.name)
