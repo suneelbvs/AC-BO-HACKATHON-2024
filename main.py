@@ -15,6 +15,7 @@ from models import (
 )
 from data_loaders.dataset import DataLoader
 from data_loaders import (
+    LD50,
     Ames,
     Halflife,
     Tox21,
@@ -49,12 +50,13 @@ def run_optimization(
             beta=1,
         )
         active_indices = np.concatenate([active_indices, new_indices])
+        # import pdb; pdb.set_trace()
         result.append(np.sum(loader.y(active_indices) > 0.5))
         del model
     return result
 
 # Prepare the data loaders, models, and acquisition functions
-data_loaders = [Ames, Halflife, Tox21]
+data_loaders = [LD50, Ames, Halflife, Tox21]
 models = [GaussianProcessModel, XGBoostModel]
 acquisition_functions = [
     probability_of_improvement_acquisition,
@@ -66,15 +68,9 @@ acquisition_functions = [
 
 # Loop over all combinations
 with open('results.csv', 'a', encoding='utf-8') as output_file:
-    for data_loader in [Ames, Halflife, Tox21]:
-        for model_class in [GaussianProcessModel, XGBoostModel]:
-            for acquisition_function in [
-                probability_of_improvement_acquisition,
-                greedy_acquisition,
-                expected_improvement_acquisition,
-                random_acquisition,
-                upper_confidence_bound_acquisition,
-            ]:
+    for data_loader in data_loaders:
+        for model_class in models:
+            for acquisition_function in acquisition_functions:
                 print(f"Testing {model_class.__name__} with ",
                       f"{acquisition_function.__name__} on {data_loader.__name__}")
                 for i in range(10): # Run 10 optimization runs per setup
