@@ -10,7 +10,7 @@ from typing import Callable, Dict
 
 from visualizers.visualize_model_progress import visualize_hits
 
-NUM_ACTIVE_LEARNING_LOOPS = 5
+NUM_ACTIVE_LEARNING_LOOPS = 10
 THRESHOLD = 0.001
 
 # Parameters for acquisition functions
@@ -43,6 +43,7 @@ def test_acquisition_function(
         mean, uncertainty = model.predict(loader.x(entire_dataset))
 
         # 3.4 compute the success metric (number of 'hits', positive examples that are above the threshold (or top 10% of entire dataset))
+        THRESHOLD = np.sort(mean)[-309]
         y_hat = mean >= THRESHOLD
         is_hit = y_hat & y
         num_hits = is_hit.sum()
@@ -82,10 +83,10 @@ if __name__ == "__main__":
     active_dataset = np.arange(0, initial_dataset_size//20) # TODO: randomize the indices?
 
     acquisition_functions = [
-        (expected_improvement_acquisition, "Expected Improvement"),
+        #(expected_improvement_acquisition, "Expected Improvement"),
         (greedy_acquisition, "Greedy"),
-        (probability_of_improvement_acquisition, "Probability of Improvement"),
-        (random_acquisition, "Random"),
+        #(probability_of_improvement_acquisition, "Probability of Improvement"),
+        #(random_acquisition, "Random"),
         (upper_confidence_bound_acquisition, "Upper Confidence Bound"),
     ] 
 
