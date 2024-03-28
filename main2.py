@@ -4,7 +4,7 @@ from models import XGBoostModel
 #from xgboost import Result
 from data_loaders.tox21 import Tox21
 #from util import results
-from results import Result
+from results import Main2Result
 from typing import List
 import numpy as np
 from sklearn.metrics import mean_squared_error, mean_absolute_error
@@ -25,7 +25,7 @@ def test_acquisition_function(
         initial_dataset: np.ndarray,
         acquisition_function,
         acquisition_function_name: str,
-) -> List[Result]:
+) -> List[Main2Result]:
     entire_dataset = np.arange(loader.size())
     random_dataset = initial_dataset
     results = []
@@ -89,7 +89,7 @@ def test_acquisition_function(
         if mse < best_observed_value:
             best_observed_value = mse
             
-        results.append(Result(
+        results.append(Main2Result(
             batch_number=batch_num,
             num_hits=num_hits,
         ))

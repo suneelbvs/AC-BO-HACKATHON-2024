@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from results import Result, ResultTracker
+from results import Main2Result, ResultTracker
 from typing import Dict
 from pathlib import Path
 
