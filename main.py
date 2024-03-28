@@ -77,7 +77,7 @@ if __name__ == "__main__":
     # loaders = [LD50(), Tox21(), halflife(), Ames()]
     # dataloaders = [hERG, hERG_1uM, hERG_10uM]
     dataloaders = [LD50]
-    models = [GaussianProcessModel(), XGBoostModel()]
+    models = [GaussianProcessModel()]
     for dataloader in dataloaders:
         loader = dataloader()
         # 1: load the fingerprint + label data + set the threshold for the succes metric
