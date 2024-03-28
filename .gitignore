@@ -2,6 +2,9 @@ venv/
 data/
 out/
 
+# datasets
+HERG*
+
 .ipynb_checkpoints/
 __pycache__/
 

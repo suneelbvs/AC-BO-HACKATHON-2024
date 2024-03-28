@@ -1,9 +1,5 @@
 from acquistion_functions import optimize_acquisition_function, probability_of_improvement_acquisition, greedy_acquisition, expected_improvement_acquisition, random_acquisition, upper_confidence_bound_acquisition
-from data_loaders.ames import Ames
-from data_loaders.dataset import DataLoader
-from data_loaders.halflife import halflife
-from data_loaders.ld50 import LD50
-from data_loaders.tox21 import Tox21
+from data_loaders import Ames, LD50, Tox21, halflife, hERG, hERG_1uM, hERG_10uM, DataLoader
 from models import XGBoostModel
 from models.gaussian_process import GaussianProcessModel
 from models.model import Model
@@ -12,7 +8,7 @@ import numpy as np
 from typing import Callable
 import math
 
-from visualizers.visualize_model_progress import visualize_results
+from visualizers.visualize import visualize_results
 
 NUM_ACTIVE_LEARNING_LOOPS = 20
 NUM_NEW_CANDIDATES_PER_BATCH = 4 # papers show that 4 new candidates is good (prob because collecting data is expensive)
@@ -78,37 +74,42 @@ def test_acquisition_function(
         active_dataset = np.concatenate([active_dataset, top_candidates])
 
 if __name__ == "__main__":
-    # 1: load the fingerprint + label data + set the threshold for the succes metric
-    loader = LD50()
-    # loader = Ames()
-    initial_dataset_size = loader.size()
-    print(f"loaded {loader.name} dataset. num entries: {initial_dataset_size}, num_y=1:{loader.y(np.arange(initial_dataset_size)).sum()}")
+    # loaders = [LD50(), Tox21(), halflife(), Ames()]
+    # dataloaders = [hERG, hERG_1uM, hERG_10uM]
+    dataloaders = [LD50]
+    models = [GaussianProcessModel(), XGBoostModel()]
+    for dataloader in dataloaders:
+        loader = dataloader()
+        # 1: load the fingerprint + label data + set the threshold for the succes metric
+        initial_dataset_size = loader.size()
+        print(f"loaded {loader.name} dataset. num entries: {initial_dataset_size}, num_y=1:{loader.y(np.arange(initial_dataset_size)).max()}")
 
-    # 2: initialize the model + initialise the first 100 data points from the dataset
-    # papers show that the first 6% of the dataset is a good starting point
-    active_dataset = np.arange(0, math.ceil(initial_dataset_size*0.06)) # TODO: randomize the indices?
+        # 2: initialize the model + initialise the first 100 data points from the dataset
+        # papers show that the first 6% of the dataset is a good starting point
+        active_dataset = np.arange(0, math.ceil(initial_dataset_size*0.06)) # TODO: randomize the indices?
 
-    acquisition_functions = [
-        (expected_improvement_acquisition, "Expected Improvement"),
-        (greedy_acquisition, "Greedy"),
-        (probability_of_improvement_acquisition, "Probability of Improvement"),
-        (random_acquisition, "Random"),
-        (upper_confidence_bound_acquisition, "Upper Confidence Bound"),
-    ] 
+        acquisition_functions = [
+            (expected_improvement_acquisition, "Expected Improvement"),
+            (greedy_acquisition, "Greedy"),
+            (probability_of_improvement_acquisition, "Probability of Improvement"),
+            (random_acquisition, "Random"),
+            (upper_confidence_bound_acquisition, "Upper Confidence Bound"),
+        ] 
 
-    # result_creator = get_regression_results_highest_y
-    result_tracker = RegressionNumOver90PercentileResultTracker()
-
-    # model = XGBoostModel()
-    model = GaussianProcessModel()
-    for acquisition_function, name in acquisition_functions:
-        test_acquisition_function(
-            model=model,
-            loader=loader,
-            initial_dataset=np.copy(active_dataset),
-            acquisition_function=acquisition_function,
-            result_tracker=result_tracker,
-            acquisition_function_name=name)
-
-    # 4: save everything
-    visualize_results(result_tracker, loader.name, model.name)
+        # result_creator = get_regression_results_highest_y
+        
+        for model in models:
+            result_tracker = RegressionNumOver90PercentileResultTracker()
+            for acquisition_function, name in acquisition_functions:
+                
+                test_acquisition_function(
+                    model=model,
+                    loader=loader,
+                    initial_dataset=np.copy(active_dataset),
+                    acquisition_function=acquisition_function,
+                    result_tracker=result_tracker,
+                    acquisition_function_name=name)
+            # 4: save everything
+            visualize_results(result_tracker, loader.name, model.name)
+        
+        del loader

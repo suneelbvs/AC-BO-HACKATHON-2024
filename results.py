@@ -102,7 +102,7 @@ class RegressionNumOver90PercentileResultTracker(ResultTracker):
         top_candidates_ys = loader.y(top_candidates)
 
         num_candidates_over_200 = np.count_nonzero(active_dataset_ys > self.ninty_percentile) + np.count_nonzero(top_candidates_ys > self.ninty_percentile)
-        print(f"[{acquisition_function_name}] batch_num: {batch_num}, num_over_200: {num_candidates_over_200}")
+        print(f"[{acquisition_function_name}] batch_num: {batch_num}, num_in_90th_percentile: {num_candidates_over_200}")
 
         self.results[acquisition_function_name].append(Result(
             batch_number=batch_num,

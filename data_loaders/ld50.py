@@ -4,7 +4,6 @@ import pandas as pd
 import ast
 
 from data_loaders.dataset import DataLoader
-from functools import lru_cache
 
 class LD50(DataLoader):
     fingerprint = 'ECFP'
