@@ -1,16 +1,19 @@
 from acquistion_functions import optimize_acquisition_function, probability_of_improvement_acquisition, greedy_acquisition, expected_improvement_acquisition, random_acquisition, upper_confidence_bound_acquisition
 from data_loaders.ames import Ames
 from data_loaders.dataset import DataLoader
+from data_loaders.halflife import halflife
 from data_loaders.tox21 import Tox21
 from models import XGBoostModel
 from models.gaussian_process import GaussianProcessModel
-from results import Result, get_regression_results_highest_y, get_regression_results_num_better_candidates
+from results import Result, get_regression_results_highest_y
 import numpy as np
 from typing import Callable, Dict
+import math
 
 from visualizers.visualize_model_progress import visualize_hits
 
 NUM_ACTIVE_LEARNING_LOOPS = 10
+NUM_NEW_CANDIDATES_PER_BATCH = 4 # papers show that 4 new candidates is good (prob because collecting data is expensive)
 
 # Parameters for acquisition functions
 xi_factor = 0.5 # for Expected Improvement
@@ -22,6 +25,7 @@ def test_acquisition_function(
         loader: DataLoader,
         initial_dataset: np.ndarray,
         acquisition_function: Callable,
+        result_creator: Callable[..., Result],
         acquisition_function_name: str,
 ) -> [Result]:
     entire_dataset = np.arange(0, loader.size()) # PERF: if the dataset is much larger, this way of indexing could be slow
@@ -52,13 +56,21 @@ def test_acquisition_function(
                                                         mean=mean,
                                                         uncertainty=uncertainty,
                                                         active_dataset=active_dataset,
-                                                        max_num_results=100,
+                                                        max_num_results=NUM_NEW_CANDIDATES_PER_BATCH,
                                                         **additional_args)
 
         # 3.5 compute the success metric (number of 'hits', positive examples that are above the threshold (or top 10% of entire dataset))
-        # results.append(get_classification_results(mean, y, batch_num, acquisition_function_name))
-        results.append(get_regression_results_highest_y(loader, active_dataset, top_candidates, batch_num, acquisition_function_name))
-        # results.append(get_regression_results_num_better_candidates(loader, active_dataset, top_candidates, batch_num, acquisition_function_name))
+        result_creator_args = {
+            "mean": mean,
+            "y": y,
+            "loader": loader,
+            "active_dataset": active_dataset,
+            "top_candidates": top_candidates,
+            "batch_num": batch_num,
+            "acquisition_function_name": acquisition_function_name,
+        }
+
+        results.append(result_creator(**result_creator_args))
 
         # 3.6 update the active learning dataset
         active_dataset = np.concatenate([active_dataset, top_candidates])
@@ -66,31 +78,35 @@ def test_acquisition_function(
 
 if __name__ == "__main__":
     # 1: load the fingerprint + label data + set the threshold for the succes metric
-    loader = Tox21()
+    loader = halflife()
     # loader = Ames()
     initial_dataset_size = loader.size()
     print(f"loaded {loader.name} dataset. num entries: {initial_dataset_size}, num_y=1:{loader.y(np.arange(initial_dataset_size)).sum()}")
 
     # 2: initialize the model + initialise the first 100 data points from the dataset
-    active_dataset = np.arange(0, initial_dataset_size//20) # TODO: randomize the indices?
+    # papers show that the first 6% of the dataset is a good starting point
+    active_dataset = np.arange(0, math.ceil(initial_dataset_size*0.06)) # TODO: randomize the indices?
 
     acquisition_functions = [
-        #(expected_improvement_acquisition, "Expected Improvement"),
+        (expected_improvement_acquisition, "Expected Improvement"),
         (greedy_acquisition, "Greedy"),
-        #(probability_of_improvement_acquisition, "Probability of Improvement"),
-        #(random_acquisition, "Random"),
+        (probability_of_improvement_acquisition, "Probability of Improvement"),
+        (random_acquisition, "Random"),
         (upper_confidence_bound_acquisition, "Upper Confidence Bound"),
     ] 
 
-    # model = XGBoostModel()
-    model = GaussianProcessModel()
+    result_creator = get_regression_results_highest_y
+
+    model = XGBoostModel()
+    # model = GaussianProcessModel()
     optimization_results: Dict[str, Result] = {}
     for acquisition_function, name in acquisition_functions:
         optimization_results[name] = test_acquisition_function(
             loader=loader,
             initial_dataset=np.copy(active_dataset),
             acquisition_function=acquisition_function,
+            result_creator=result_creator,
             acquisition_function_name=name)
 
     # 4: save everything
-    visualize_hits(optimization_results)
+    visualize_hits(optimization_results, result_creator)

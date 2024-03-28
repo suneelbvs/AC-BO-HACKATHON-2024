@@ -40,5 +40,4 @@ def optimize(*,
     
     indices = best_rows[:, 1].astype(np.int64) # since the row was a float dtype (cause we concatenated with the values_with_indices), we need to convert the indices back to int
     num_candidates = min(max_num_results, len(indices)) # guards against the case where there are fewer than max_num_results candidates
-    print(num_candidates)
     return np.random.choice(indices, num_candidates, replace=False)
