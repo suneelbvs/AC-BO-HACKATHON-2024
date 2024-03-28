@@ -19,7 +19,7 @@ NUM_ACTIVE_LEARNING_LOOPS = 20
 NUM_NEW_CANDIDATES_PER_BATCH = 20 # papers show that 4 new candidates is good (prob because collecting data is expensive)
 
 # Parameters for acquisition functions
-xi_factor = 0.5 # for Expected Improvement
+xi_factor = 0.5 # for Expected Improvement # TODO: tune
 beta = 0.5 # for Upper Confidence Bound
 
 
