@@ -7,3 +7,4 @@ __pycache__/
 
 .vscode
 .DS_Store
+datasets/fingerprint_datasets/LD50_Zhu_ECFP.h5
