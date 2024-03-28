@@ -16,6 +16,10 @@ class DataLoader:
     def size(self) -> int:
         """ Returns the size of the dataset """
         pass
+
+    def hit_threshold(self) -> float:
+        """ Returns the 'hit' threshold for the dataset """
+        pass
  
     def x(self, dataset_slice: slice | np.ndarray = None) -> np.ndarray:
         """

@@ -50,8 +50,7 @@ def run_optimization(
             beta=1,
         )
         active_indices = np.concatenate([active_indices, new_indices])
-        # import pdb; pdb.set_trace()
-        result.append(np.sum(loader.y(active_indices) > 0.5))
+        result.append(np.sum(loader.y(active_indices) > loader.hit_threshold()))
         del model
     return result
 
@@ -73,7 +72,7 @@ with open('results.csv', 'a', encoding='utf-8') as output_file:
             for acquisition_function in acquisition_functions:
                 print(f"Testing {model_class.__name__} with ",
                       f"{acquisition_function.__name__} on {data_loader.__name__}")
-                for i in range(10): # Run 10 optimization runs per setup
+                for i in range(1): # Run 10 optimization runs per setup
                     print(f"Run {i}", end='\r')
                     result = run_optimization(
                         model_class=model_class,
