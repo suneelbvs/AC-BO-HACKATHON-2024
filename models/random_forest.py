@@ -13,11 +13,7 @@ class RandomForestModel(Model):
 
     def predict(self, test_x):
         mean = self.model.predict(test_x) # PERF: maybe we can remove this call and just use individual_predictions below?
-        individual_predictions = np.array([tree.predict(test_x) for tree in self.model.estimators_])
-        # individual_predictions = Parallel(n_jobs=-1)(
-        #     delayed(tree.predict)(test_x) for tree in self.model.estimators_
-        # )
-        # individual_predictions = np.array(individual_predictions)
+        individual_predictions = np.array([tree.predict(test_x) for tree in self.model.estimators_]) # PERF: parallelize this
         variance = np.var(individual_predictions, axis=0)
 
         return mean, variance
