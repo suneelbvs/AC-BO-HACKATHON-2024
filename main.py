@@ -2,18 +2,19 @@ from acquistion_functions import optimize_acquisition_function, probability_of_i
 from data_loaders.ames import Ames
 from data_loaders.dataset import DataLoader
 from data_loaders.halflife import halflife
+from data_loaders.ld50 import LD50
 from data_loaders.tox21 import Tox21
 from models import XGBoostModel
 from models.gaussian_process import GaussianProcessModel
 from models.model import Model
-from results import RegressionHighestYResultTracker, RegressionNumBetterCandidatesResultTracker, ResultTracker
+from results import RegressionHighestYResultTracker, RegressionNumBetterCandidatesResultTracker, RegressionNumOver90PercentileResultTracker, ResultTracker
 import numpy as np
 from typing import Callable
 import math
 
 from visualizers.visualize_model_progress import visualize_results
 
-NUM_ACTIVE_LEARNING_LOOPS = 60
+NUM_ACTIVE_LEARNING_LOOPS = 20
 NUM_NEW_CANDIDATES_PER_BATCH = 4 # papers show that 4 new candidates is good (prob because collecting data is expensive)
 
 # Parameters for acquisition functions
@@ -78,7 +79,7 @@ def test_acquisition_function(
 
 if __name__ == "__main__":
     # 1: load the fingerprint + label data + set the threshold for the succes metric
-    loader = halflife()
+    loader = LD50()
     # loader = Ames()
     initial_dataset_size = loader.size()
     print(f"loaded {loader.name} dataset. num entries: {initial_dataset_size}, num_y=1:{loader.y(np.arange(initial_dataset_size)).sum()}")
@@ -96,7 +97,7 @@ if __name__ == "__main__":
     ] 
 
     # result_creator = get_regression_results_highest_y
-    result_tracker = RegressionNumBetterCandidatesResultTracker()
+    result_tracker = RegressionNumOver90PercentileResultTracker()
 
     # model = XGBoostModel()
     model = GaussianProcessModel()

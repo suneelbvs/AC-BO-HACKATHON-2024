@@ -83,3 +83,28 @@ class RegressionNumOver200ResultTracker(ResultTracker):
             batch_number=batch_num,
             y_axis=num_candidates_over_200,
         ))
+
+
+class RegressionNumOver90PercentileResultTracker(ResultTracker):
+    y_label = "Num Over 90 percentile"
+
+    def __init__(self):
+        self.ninty_percentile = None
+
+    def add_result(self, *, loader: DataLoader, active_dataset: np.ndarray, top_candidates: np.ndarray,
+                     batch_num:int, acquisition_function_name: str, **kwargs):
+        
+        if self.ninty_percentile is None:
+            sorted_y_values = np.sort(loader.y(np.arange(loader.size()))) # PERF: do we need to sort?
+            self.ninty_percentile = np.percentile(sorted_y_values, 90)
+
+        active_dataset_ys = loader.y(active_dataset)
+        top_candidates_ys = loader.y(top_candidates)
+
+        num_candidates_over_200 = np.count_nonzero(active_dataset_ys > self.ninty_percentile) + np.count_nonzero(top_candidates_ys > self.ninty_percentile)
+        print(f"[{acquisition_function_name}] batch_num: {batch_num}, num_over_200: {num_candidates_over_200}")
+
+        self.results[acquisition_function_name].append(Result(
+            batch_number=batch_num,
+            y_axis=num_candidates_over_200,
+        ))
