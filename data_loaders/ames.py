@@ -7,14 +7,8 @@ from data_loaders.dataset import DataLoader
 from functools import lru_cache
 
 class Ames(DataLoader):
-<<<<<<< HEAD
-    fingerprint = 'Mordred'
-    
-=======
-
     fingerprint= 'Mordred'
 
->>>>>>> 788892f (Fix fingerprint attributes)
     def __init__(self):
         # We're using the Mordred fingerprint
         # This dataset was generated using Mordred.py
