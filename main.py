@@ -8,11 +8,12 @@ from models.gaussian_process import GaussianProcessModel
 from results import Result, get_regression_results_highest_y
 import numpy as np
 from typing import Callable, Dict
+import math
 
 from visualizers.visualize_model_progress import visualize_hits
 
 NUM_ACTIVE_LEARNING_LOOPS = 10
-NUM_NEW_CANDIDATES_PER_BATCH = 10
+NUM_NEW_CANDIDATES_PER_BATCH = 4
 
 # Parameters for acquisition functions
 xi_factor = 0.5 # for Expected Improvement
@@ -83,7 +84,8 @@ if __name__ == "__main__":
     print(f"loaded {loader.name} dataset. num entries: {initial_dataset_size}, num_y=1:{loader.y(np.arange(initial_dataset_size)).sum()}")
 
     # 2: initialize the model + initialise the first 100 data points from the dataset
-    active_dataset = np.arange(0, initial_dataset_size//20) # TODO: randomize the indices?
+    # papers show that the first 6% of the dataset is a good starting point
+    active_dataset = np.arange(0, math.ceil(initial_dataset_size*0.06)) # TODO: randomize the indices?
 
     acquisition_functions = [
         (expected_improvement_acquisition, "Expected Improvement"),
@@ -95,8 +97,8 @@ if __name__ == "__main__":
 
     result_creator = get_regression_results_highest_y
 
-    # model = XGBoostModel()
-    model = GaussianProcessModel()
+    model = XGBoostModel()
+    # model = GaussianProcessModel()
     optimization_results: Dict[str, Result] = {}
     for acquisition_function, name in acquisition_functions:
         optimization_results[name] = test_acquisition_function(
