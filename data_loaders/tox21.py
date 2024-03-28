@@ -8,6 +8,10 @@ from functools import lru_cache
 # https://tdcommons.ai/single_pred_tasks/tox/#tox21
 
 class Tox21(DataLoader):
+<<<<<<< HEAD
+=======
+
+>>>>>>> 788892f (Fix fingerprint attributes)
     fingerprint = 'ECFP'
 
     def __init__(self):
