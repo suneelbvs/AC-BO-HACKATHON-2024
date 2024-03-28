@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
-from results import Main2Result, ResultTracker
-from typing import Dict
+from results import ResultTracker
 from pathlib import Path
 
 def visualize_results(result_tracker: ResultTracker, loader_name: str, model_name:str):
