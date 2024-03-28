@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from results import Result
 from typing import Dict
+from pathlib import Path
 
 def visualize_hits(optimization_results: Dict[str, Result]):
     fig, ax = plt.subplots()
@@ -20,6 +21,7 @@ def visualize_hits(optimization_results: Dict[str, Result]):
     ax.set_title('Num Hits')
     ax.legend()
 
+    Path("out").mkdir(parents=True, exist_ok=True)
     plt.savefig('out/hit_graph.png')
 
     # Display the graph

@@ -19,4 +19,3 @@ class DataLoader:
     # for a given slice of the dataset, we'll return the y values
     def y(self, dataset_slice: np.ndarray) -> np.ndarray:
         pass
-    

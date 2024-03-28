@@ -1,7 +1,9 @@
 from acquistion_functions import optimize_acquisition_function, probability_of_improvement_acquisition, greedy_acquisition, expected_improvement_acquisition, random_acquisition, upper_confidence_bound_acquisition
 from data_loaders.ames import Ames
 from data_loaders.dataset import DataLoader
+from data_loaders.tox21 import Tox21
 from models import XGBoostModel
+from models.gaussian_process import GaussianProcessModel
 from results import Result
 import numpy as np
 from typing import Callable, Dict
@@ -9,7 +11,7 @@ from typing import Callable, Dict
 from visualizers.visualize_model_progress import visualize_hits
 
 NUM_ACTIVE_LEARNING_LOOPS = 5
-THRESHOLD = 0.02
+THRESHOLD = 0.001
 
 # Parameters for acquisition functions
 xi_factor = 0.5 # for Expected Improvement
@@ -71,10 +73,10 @@ def test_acquisition_function(
 
 if __name__ == "__main__":
     # 1: load the fingerprint + label data + set the threshold for the succes metric
-    # loader = Tox21()
-    loader = Ames()
+    loader = Tox21()
+    # loader = Ames()
     initial_dataset_size = loader.size()
-    print(f"loaded {loader.name} dataset. num entries: {initial_dataset_size}")
+    print(f"loaded {loader.name} dataset. num entries: {initial_dataset_size}, num_y=1:{loader.y(np.arange(initial_dataset_size)).sum()}")
 
     # 2: initialize the model + initialise the first 100 data points from the dataset
     active_dataset = np.arange(0, initial_dataset_size//20) # TODO: randomize the indices?
@@ -87,7 +89,8 @@ if __name__ == "__main__":
         (upper_confidence_bound_acquisition, "Upper Confidence Bound"),
     ] 
 
-    model = XGBoostModel()
+    # model = XGBoostModel()
+    model = GaussianProcessModel()
     optimization_results: Dict[str, Result] = {}
     for acquisition_function, name in acquisition_functions:
         optimization_results[name] = test_acquisition_function(

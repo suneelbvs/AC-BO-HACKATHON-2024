@@ -1,7 +1,7 @@
 from tdc.utils import retrieve_label_name_list
 from tdc.single_pred import Tox
 import numpy as np
-
+from transformer.fingerprints import FingerprintsTransformer
 from data_loaders.dataset import DataLoader
 
 # https://tdcommons.ai/single_pred_tasks/tox/#tox21
@@ -10,16 +10,17 @@ class Tox21(DataLoader):
         label_list = retrieve_label_name_list('Tox21')
         data = Tox(name = 'Tox21', label_name = label_list[0]).get_data()
 
-        # TODO: use real features
-        data["num_oxygen"] = data["Drug"].str.count("O")
-        self.data = data
+        transformer = FingerprintsTransformer(data, "Drug", "ECFP")
+        
         self.name = "Tox21"
+        self.x_values = transformer.to_np()
+        self.y_values = data["Y"].to_numpy()
 
     def size(self):
-        return len(self.data)
+        return len(self.x_values)
 
     def x(self, dataset_slice_indices: np.ndarray) -> np.ndarray:
-        return np.expand_dims(self.data.iloc[dataset_slice_indices]["num_oxygen"].to_numpy(), 1)
+        return self.x_values[dataset_slice_indices]
 
     def y(self, dataset_slice_indices):
-        return self.data.iloc[dataset_slice_indices]["Y"].to_numpy()
+        return self.y_values[dataset_slice_indices]
