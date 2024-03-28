@@ -13,7 +13,7 @@ def get_ylabel(result_creator: Callable[..., Result]) -> str:
     else:
         raise ValueError("Unknown result creator")
 
-def visualize_hits(optimization_results: Dict[str, Result], result_creator: Callable[..., Result]):
+def visualize_hits(optimization_results: Dict[str, Result], result_creator: Callable[..., Result], loader_name: str, model_name:str):
     fig, ax = plt.subplots()
 
     # Plot the number of hits for each acquisition function
@@ -28,11 +28,12 @@ def visualize_hits(optimization_results: Dict[str, Result], result_creator: Call
     ax.set_xticks(x)
     ax.set_xticklabels(x)
 
-    ax.set_title('Num Hits')
+    title = f"{loader_name} dataset using {model_name}"
+    ax.set_title(title)
     ax.legend()
 
     Path("out").mkdir(parents=True, exist_ok=True)
-    plt.savefig('out/hit_graph.png')
+    plt.savefig(f"out/{title.replace(' ', '_')}.png")
 
     # Display the graph
     # plt.show()
