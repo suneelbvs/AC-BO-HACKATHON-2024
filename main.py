@@ -55,7 +55,7 @@ def run_optimization(
     return result
 
 # Prepare the data loaders, models, and acquisition functions
-data_loaders = [LD50, Ames, Halflife, Tox21]
+data_loaders = [LD50, Halflife] #, Ames, Halflife, Tox21]  run regression tasks
 models = [GaussianProcessModel, XGBoostModel]
 acquisition_functions = [
     probability_of_improvement_acquisition,
@@ -72,7 +72,7 @@ with open('results.csv', 'a', encoding='utf-8') as output_file:
             for acquisition_function in acquisition_functions:
                 print(f"Testing {model_class.__name__} with ",
                       f"{acquisition_function.__name__} on {data_loader.__name__}")
-                for i in range(1): # Run 10 optimization runs per setup
+                for i in range(3): # Run 10 optimization runs per setup
                     print(f"Run {i}", end='\r')
                     result = run_optimization(
                         model_class=model_class,
@@ -81,4 +81,5 @@ with open('results.csv', 'a', encoding='utf-8') as output_file:
                     )
                     result_string = ','.join(map(str, result))
                     output_file.write(f"{data_loader.__name__},{model_class.__name__},"
+                                      f"{data_loader.fingerprint},"
                                       f"{acquisition_function.__name__},{result_string}\n")

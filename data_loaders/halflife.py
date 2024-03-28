@@ -16,6 +16,7 @@ class Halflife(DataLoader):
         transformer = FingerprintsTransformer(self.data, "Drug", "ECFP")
 
         self.name = "halflife"
+        self.fingerprint = 'ECFP'
         self.x_values = transformer.to_np()
         self.y_values = self.data["Y"].to_numpy()
 

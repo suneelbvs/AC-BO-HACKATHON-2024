@@ -15,6 +15,7 @@ class Tox21(DataLoader):
         transformer = FingerprintsTransformer(data, "Drug", "ECFP")
 
         self.name = "Tox21"
+        self.fingerprint = 'ECFP'
         self.x_values = transformer.to_np()
         self.y_values = data["Y"].to_numpy()
 

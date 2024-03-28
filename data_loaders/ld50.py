@@ -15,6 +15,7 @@ class LD50(DataLoader):
         )
         self.data = pd.read_hdf(path)
         self.name = "ld50"
+        self.fingerprint = 'ECFP'
         self.x_values = np.stack(self.data['fingerprint_ECFP'])
         self.y_values = self.data["Y"].to_numpy()
 
