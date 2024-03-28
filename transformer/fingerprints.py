@@ -3,7 +3,6 @@ import numpy as np
 from rdkit import Chem
 from rdkit.Chem import AllChem
 from rdkit import DataStructs
-from mordred import Calculator, descriptors
 
 class FingerprintsTransformer:
     def __init__(self, dataset: pd.DataFrame, col_mol:str, fingerprint_type:str):
