@@ -1,113 +1,89 @@
-from acquistion_functions import optimize_acquisition_function, probability_of_improvement_acquisition, greedy_acquisition, expected_improvement_acquisition, random_acquisition, upper_confidence_bound_acquisition
-from data_loaders.ames import Ames
-from data_loaders.dataset import DataLoader
-from data_loaders.halflife import halflife
-from data_loaders.tox21 import Tox21
-from models import XGBoostModel
-from models.gaussian_process import GaussianProcessModel
-from models.model import Model
-from results import RegressionHighestYResultTracker, RegressionNumBetterCandidatesResultTracker, ResultTracker
-import numpy as np
 from typing import Callable
-import math
-
-from visualizers.visualize_model_progress import visualize_results
+import numpy as np
+from acquistion_functions import (
+    optimize_acquisition_function,
+    probability_of_improvement_acquisition,
+    greedy_acquisition,
+    expected_improvement_acquisition,
+    random_acquisition,
+    upper_confidence_bound_acquisition,
+)
+from models.model import Model
+from models import (
+    GaussianProcessModel,
+    XGBoostModel,
+)
+from data_loaders.dataset import DataLoader
+from data_loaders import (
+    Ames,
+    Halflife,
+    Tox21,
+)
 
 NUM_ACTIVE_LEARNING_LOOPS = 60
-NUM_NEW_CANDIDATES_PER_BATCH = 4 # papers show that 4 new candidates is good (prob because collecting data is expensive)
+NUM_NEW_CANDIDATES_PER_BATCH = 4
 
-# Parameters for acquisition functions
-xi_factor = 0.5 # for Expected Improvement
-beta = 0.5 # for Upper Confidence Bound
+def run_optimization(
+    model_class: Model,
+    data_loader: DataLoader,
+    acquisition_function: Callable,
+) -> list[int]:
+    loader = data_loader()
+    active_indices = np.random.choice(loader.size(), 50, replace=False)
 
-
-def test_acquisition_function(
-        *,
-        model: Model,
-        loader: DataLoader,
-        initial_dataset: np.ndarray,
-        acquisition_function: Callable,
-        result_tracker: ResultTracker,
-        acquisition_function_name: str,
-):
-    entire_dataset = np.arange(0, loader.size()) # PERF: if the dataset is much larger, this way of indexing could be slow
-    active_dataset = initial_dataset
-
-    y = loader.y(entire_dataset) == 1
-
-    # 3: carry out the active learning loop for N times
-    for batch_num in range(1, NUM_ACTIVE_LEARNING_LOOPS + 1):
-        print(f"[{acquisition_function_name}] active_dataset size: ", len(active_dataset))
-        # 3.1 update global parameters needed for acquisition functions
-        best_observed_value = loader.y(active_dataset).max()
-
-        # 3.2 train the surrogate model from model.py on the active learning dataset
-        model.fit(loader.x(active_dataset), loader.y(active_dataset))
-
-        # 3.3 run the surrogate model over the unseen dataset and get predicted values for endpoints
-        mean, uncertainty = model.predict(loader.x(entire_dataset))
-    
-        # 3.4. get the top candidates from the acquisition function and add them to the active learning dataset
-        optimize_acquisition_function_args = {
-            "acquisition_function":acquisition_function,
-            "mean": mean,
-            "uncertainty": uncertainty,
-            "active_dataset": active_dataset,
-            "max_num_results": NUM_NEW_CANDIDATES_PER_BATCH,
-            "best_observed_value": best_observed_value,
-            "xi_factor": xi_factor,
-            "beta": beta,
-        }
-        top_candidates = optimize_acquisition_function(**optimize_acquisition_function_args)
-
-        # 3.5 compute the success metric
-        result_tracker_args = {
-            "mean": mean,
-            "y": y,
-            "loader": loader,
-            "active_dataset": active_dataset,
-            "top_candidates": top_candidates,
-            "batch_num": batch_num,
-            "acquisition_function_name": acquisition_function_name,
-        }
-
-        result_tracker.add_result(**result_tracker_args)
-
-        # 3.6 update the active learning dataset
-        active_dataset = np.concatenate([active_dataset, top_candidates])
-
-if __name__ == "__main__":
-    # 1: load the fingerprint + label data + set the threshold for the succes metric
-    loader = halflife()
-    # loader = Ames()
-    initial_dataset_size = loader.size()
-    print(f"loaded {loader.name} dataset. num entries: {initial_dataset_size}, num_y=1:{loader.y(np.arange(initial_dataset_size)).sum()}")
-
-    # 2: initialize the model + initialise the first 100 data points from the dataset
-    # papers show that the first 6% of the dataset is a good starting point
-    active_dataset = np.arange(0, math.ceil(initial_dataset_size*0.06)) # TODO: randomize the indices?
-
-    acquisition_functions = [
-        (expected_improvement_acquisition, "Expected Improvement"),
-        (greedy_acquisition, "Greedy"),
-        (probability_of_improvement_acquisition, "Probability of Improvement"),
-        (random_acquisition, "Random"),
-        (upper_confidence_bound_acquisition, "Upper Confidence Bound"),
-    ] 
-
-    # result_creator = get_regression_results_highest_y
-    result_tracker = RegressionNumBetterCandidatesResultTracker()
-
-    # model = XGBoostModel()
-    model = GaussianProcessModel()
-    for acquisition_function, name in acquisition_functions:
-        test_acquisition_function(
-            model=model,
-            loader=loader,
-            initial_dataset=np.copy(active_dataset),
+    result = []
+    for _ in range(NUM_ACTIVE_LEARNING_LOOPS):
+        active_x = loader.x(active_indices)
+        active_y = loader.y(active_indices)
+        model = model_class()
+        model.fit(active_x, active_y)
+        mean, uncertainty = model.predict(loader.x())
+        new_indices = optimize_acquisition_function(
             acquisition_function=acquisition_function,
-            result_tracker=result_tracker,
-            acquisition_function_name=name)
+            mean=mean,
+            uncertainty=uncertainty,
+            active_dataset=loader.x(active_indices),
+            max_num_results=NUM_NEW_CANDIDATES_PER_BATCH,
+            best_observed_value=np.max(active_y),
+            xi_factor=1.01,
+            beta=1,
+        )
+        active_indices = np.concatenate([active_indices, new_indices])
+        result.append(np.sum(loader.y(active_indices) > 0.5))
+        del model
+    return result
 
-    # 4: save everything
-    visualize_results(result_tracker, loader.name, model.name)
+# Prepare the data loaders, models, and acquisition functions
+data_loaders = [Ames, Halflife, Tox21]
+models = [GaussianProcessModel, XGBoostModel]
+acquisition_functions = [
+    probability_of_improvement_acquisition,
+    greedy_acquisition,
+    expected_improvement_acquisition,
+    random_acquisition,
+    upper_confidence_bound_acquisition,
+]
+
+# Loop over all combinations
+with open('results.csv', 'a', encoding='utf-8') as output_file:
+    for data_loader in [Ames, Halflife, Tox21]:
+        for model_class in [GaussianProcessModel, XGBoostModel]:
+            for acquisition_function in [
+                probability_of_improvement_acquisition,
+                greedy_acquisition,
+                expected_improvement_acquisition,
+                random_acquisition,
+                upper_confidence_bound_acquisition,
+            ]:
+                print(f"Testing {model_class.__name__} with ",
+                      f"{acquisition_function.__name__} on {data_loader.__name__}")
+                for i in range(10): # Run 10 optimization runs per setup
+                    print(f"Run {i}", end='\r')
+                    result = run_optimization(
+                        model_class=model_class,
+                        data_loader=data_loader,
+                        acquisition_function=acquisition_function,
+                    )
+                    result_string = ','.join(map(str, result))
+                    output_file.write(f"{data_loader.__name__},{model_class.__name__},"
+                                      f"{acquisition_function.__name__},{result_string}\n")
