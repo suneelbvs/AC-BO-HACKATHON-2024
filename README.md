@@ -4,6 +4,9 @@
 ### Abstract
 This project conducts a comparative analysis of acquisition functions in Bayesian Optimization (BO) for drug discovery, focusing on small, diverse, unbalanced, and noisy datasets. It evaluates the impact of different acquisition functions, molecular featurization methods, and applicability domain (AD) to uncover optimal strategies for employing AF effectively in drug discovery challenges.
 
+### Project Report:
+Please refer the github page for our observations: **https://suneelbvs.github.io/AC-BO-Hackathon.html#/**
+
 ### Installation
 ### Installation using individual packages:
 To install an editable version of the package, run the following command:
