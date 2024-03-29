@@ -14,11 +14,8 @@ pip install torch
 pip install gpytorch
 pip install requests
 ```
-### Installation using Environment
-
-
 ### Tutorial
-
+!python main.py (assuming you updated correct data_loader) for model building
 
 ### References
 - Hugo Bellamy (2022), "Batched Bayesian Optimization for Drug Design in Noisy Environments," J Chem Inf Model. 2022 Sep 12; 62(17): 3970–3981.
